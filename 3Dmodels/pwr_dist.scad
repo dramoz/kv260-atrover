@@ -40,10 +40,10 @@ difference() {
     translate([wall_width, wall_width, bottom_width])
       cube([box_l_adj, box_w_adj, box_h_adj+bottom_width]);
       
-    translate([xy_dim_adj(2)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(30), 3*wall_width, box_h_adj+bottom_width]);
+    translate([xy_dim_adj(4)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+      cube([xy_dim_adj(28), 3*wall_width, box_h_adj+bottom_width]);
     translate([xy_dim_adj(34)+wall_width, -wall_width, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(23), 3*wall_width, box_h_adj+bottom_width]);
+      cube([xy_dim_adj(21), 3*wall_width, box_h_adj+bottom_width]);
     
     for(xy = screws_xy) {
       translate([xy[0], xy[1], screws_hd_offset])
@@ -55,7 +55,7 @@ difference() {
 }
 
 // cap
-translate([-box_l_adj-4*wall_width, 0, 0])
+*translate([-box_l_adj-4*wall_width, 0, 0])
 difference() {
   translate([-wall_width, -wall_width, 0])
     cube([box_l_adj+4*wall_width, box_w_adj+4*wall_width, cap_h_adj+bottom_width]);

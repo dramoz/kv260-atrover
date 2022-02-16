@@ -40,10 +40,10 @@ difference() {
     translate([wall_width, wall_width, bottom_width])
       cube([box_l_adj, box_w_adj, box_h_adj+bottom_width]);
     
-    translate([xy_dim_adj(12)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(28), 3*wall_width, box_h_adj+bottom_width]);
+    translate([xy_dim_adj(17)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+      cube([xy_dim_adj(26), 3*wall_width, box_h_adj+bottom_width]);
     translate([xy_dim_adj(27)+wall_width, -wall_width, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(28), 3*wall_width, box_h_adj+bottom_width]);
+      cube([xy_dim_adj(26), 3*wall_width, box_h_adj+bottom_width]);
       
     translate([-wall_width, xy_dim_adj(21)+wall_width,, bottom_width+box_bt_h_adj])
       cube([3*wall_width, xy_dim_adj(10), box_h_adj+bottom_width]);
@@ -58,7 +58,7 @@ difference() {
 }
 
 // cap
-translate([-box_l_adj-4*wall_width, 0, 0])
+*translate([-box_l_adj-4*wall_width, 0, 0])
 difference() {
   translate([-wall_width, -wall_width, 0])
     cube([box_l_adj+4*wall_width, box_w_adj+4*wall_width, cap_h_adj+bottom_width]);
