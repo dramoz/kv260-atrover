@@ -1,7 +1,7 @@
 first_layer_height = 0.4;
 layer_height = 0.6;
 
-bottom_width = first_layer_height + 2*layer_height;
+bottom_width = first_layer_height + 3*layer_height;
 top_width = 2*layer_height;
 // lines: width (mm)
 // 2: 1.67
@@ -14,8 +14,8 @@ wall_width = 2.44;
 function xy_dim_adj(x) = ceil(x/wall_width)*wall_width;
 function  z_dim_adj(z) = ceil(z/layer_height)*layer_height;
 
-box_l = 139;
-box_w = 119;
+box_l = 140;
+box_w = 120;
 box_h = 36;
 box_bt_h = 6;
 cap_h = 8;
@@ -28,13 +28,14 @@ cap_h_adj = z_dim_adj(cap_h);
 
 screws_hd = 5.55;
 screws_hh = 2.38;
-screws_hd_offset = first_layer_height;
+screws_hd_offset = first_layer_height+1*layer_height;
 screws_d = 3;
+screws_wall_offset_cnt = 6;
 screws_xy = [
-  [            3*wall_width, 3*wall_width],
-  [box_l_adj - 1*wall_width, 3*wall_width],
-  [            3*wall_width, box_w_adj-1*wall_width],
-  [box_l_adj - 1*wall_width, box_w_adj-1*wall_width]
+  [            6*wall_width,           6*wall_width],
+  [box_l_adj - 3*wall_width,           6*wall_width],
+  [            6*wall_width, box_w_adj-3*wall_width],
+  [box_l_adj - 3*wall_width, box_w_adj-3*wall_width]
 ];
 
 screws_hd_adj = xy_dim_adj(screws_hd);
@@ -47,15 +48,14 @@ difference() {
       cube([box_l_adj, box_w_adj, box_h_adj+bottom_width]);
     
     translate([xy_dim_adj(12)+wall_width, -wall_width, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(114.5), 3*wall_width, box_h_adj+bottom_width]);
+      cube([xy_dim_adj(118), 3*wall_width, box_h_adj+bottom_width]);
       
-    translate([xy_dim_adj(21)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+    translate([xy_dim_adj(22)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
       cube([xy_dim_adj(14), 3*wall_width, z_dim_adj(2+2)]);
     translate([xy_dim_adj(80)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(8), 3*wall_width, z_dim_adj(3+2)]);
-    translate([xy_dim_adj(97)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(15), 3*wall_width, z_dim_adj(5+2)]);
-    
+      cube([xy_dim_adj(10), 3*wall_width, z_dim_adj(3+2)]);
+    translate([xy_dim_adj(98)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+      cube([xy_dim_adj(18), 3*wall_width, z_dim_adj(5+2)]);
     
     for(xy = screws_xy) {
       translate([xy[0], xy[1], screws_hd_offset])
