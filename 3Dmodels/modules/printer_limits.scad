@@ -5,17 +5,19 @@ layer_height = 0.6;
 bottom_width = first_layer_height + 3*layer_height;
 top_width = 2*layer_height;
 // lines: width (mm)
-// 2: 1.67
-// 3: 2.44
-// 4: 3.21
-// 5: 3.98
-// 6: 4.76
-ptr_wall_width = 2.44;
+ptr_2lines = 1.67;
+ptr_3lines = 2.44;
+ptr_4lines = 3.21;
+ptr_5lines = 3.98;
+ptr_6lines = 4.76;
+
+ptr_wall_width = ptr_3lines;
 
 min_x = 8;
 max_x = 223;
 min_y = 2;
 max_y = 207;
+max_z = 200;
 
 // LxW
 max_printable_length = max(max_x-min_x, max_y-min_y);
