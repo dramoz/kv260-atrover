@@ -3,6 +3,11 @@
 // KV260-ATRover
 // (mini version for testing)
 // Units 1:1mm
+//
+// TODO:
+// +Ultrasonic sensor (front->kv260_enclosure)
+// +IR floor sensor   (front_bottom->kv260_enclosure)
+// -> CAM later
 // ----------------------------------------------------------------------------------
 include<./modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
@@ -29,19 +34,33 @@ mnt_screw_d_nut_h = 2.55 + tolerance;
 // ----------------------------------------------------------------------------------
 // Drawing options
 draw_base = true;
-draft_battery_enclosure = true;
+draw_motors_support = true;
+draw_base_casters = true;
+draft_battery_enclosure = false;
 
 // ---------------------------------------
 draft_guides = false;
-draft_wheels = true;
-draft_motors = true;
+draft_wheels = false;
+draft_motors = false;
 draft_battery = false;
-draft_kv260_enclosure = true;
+draft_kv260_enclosure = false;
 
-caster_test = false;
+// ---------------------------------------
+perimeters_test = false;
+dims_test = false;
+bat_holder_test = false;
+
+full_caster_test = false;
+bearing_caster_test = false;
+caster_tolerance = 0.2;
+caster_bearing_tolerance = 0.8;
+
+motor_enclosure_test = true;
+motor_enclosure_tolerance = 0.35;
+
 half_model = false;
 // ---------------------------------------
-_half_model = half_model || caster_test;
+_half_model = half_model;
 _rotate_model = !(draft_guides || draft_wheels || draft_motors || draft_battery_enclosure || draft_battery);
 // *********************************************************************************************
 // ----------------------------------------------------------------------------------
@@ -53,15 +72,15 @@ dims = KV260_enclosure_dims();
 kv260_box_l = dims[0];
 kv260_box_w = dims[1];
 kv260_box_h = dims[2];
-box_bt_h = dims[3];
-cap_h = dims[4];
+kv260_box_bt_h = dims[3];
+kv260_lid_h = dims[4];
 
 kv260_wall_width = ptr_wall_width;
 
 kv260_screws_xy =  [[48.8, 24.4], [117.12, 24.4], [48.8, 109.8], [117.12, 109.8]];
 kv260_screws_d = 3.2;
-kv260_x_trans = kv260_box_w+2*kv260_wall_width;///2+kv260_wall_width;
-kv260_y_trans = base_length/2 - battery_width-kv260_box_l;
+kv260_x_trans = (kv260_box_w+2*kv260_wall_width)/2;
+kv260_y_trans = -(kv260_box_l+2*kv260_wall_width);//base_length/2 - battery_width-kv260_box_l;
 kv260_z_trans = base_wall_width;
 // *********************************************************************************************
 // ----------------------------------------------------------------------------------
@@ -197,7 +216,7 @@ module kv260_atrover_mini(
         }
     }
   }
-  module battery_enclosure_srews() {
+  module battery_enclosure_screws() {
     screws_xy = [
       [-bat_case_l/2+(bat_supports_xy_size/2+wall_width)/2, 0],
       [ bat_case_l/2-(bat_supports_xy_size/2+wall_width)/2, 0],
@@ -239,6 +258,8 @@ module kv260_atrover_mini(
               }
             }
           }
+      }
+      if(draw_motors_support) {
         // Rear motors support
         for(m=[0:1]) {
           mirror([m,0,0])
@@ -253,10 +274,11 @@ module kv260_atrover_mini(
                   total_treads=360/8,
                   spokes=360/60,
                   draft=draft,
-                  tolerance=0.3
+                  tolerance=motor_enclosure_tolerance
                 );
         }
-        
+      }
+      if(draw_base_casters) {
         // front casters
         color("green", alpha=0.15) {
           for(m=[0:1]) {
@@ -283,9 +305,9 @@ module kv260_atrover_mini(
                       rod_screw_offset=4,
                       rod_width=rod_width,
                       rod_screw_diameter=10,
-                      bearing_tolerance=0.5,  // TODO: test me!
+                      bearing_tolerance=caster_bearing_tolerance,
                       draft=false,
-                      tolerance=0.2
+                      tolerance=caster_tolerance
                     );
                     *translate([50, 0, 0])
                       cube(100, center=true);
@@ -351,27 +373,32 @@ module kv260_atrover_mini(
     if(!draft_battery_enclosure) {
         battery_enclosure();
     }
-    battery_enclosure_srews();
+    battery_enclosure_screws();
   }
 }
 
 // ----------------------------------------------------------------------------------
+module draw_kv260_atrover_mini() {
+  kv260_atrover_mini(
+      wheel_diameter=wheel_diameter,
+      wheel_width=wheel_width,
+      mower_height=10,
+      flipped=flipped,
+      draw_wheels=draft_wheels,
+      draw_motors=draft_motors,
+      wall_width=wall_width,
+      botttom_supports=false,
+      draft=false
+    );
+}
+rotate_angle = (_rotate_model)?(180):(0);
+flipped = _rotate_model;
+rotate([0, 0, 90])
 difference() {
   union() {
-    rotate_angle = (_rotate_model)?(180):(0);
-    flipped = _rotate_model;
     rotate([0, rotate_angle, 0])
-      kv260_atrover_mini(
-        wheel_diameter=wheel_diameter,
-        wheel_width=wheel_width,
-        mower_height=10,
-        flipped=flipped,
-        draw_wheels=draft_wheels,
-        draw_motors=draft_motors,
-        wall_width=wall_width,
-        botttom_supports=false,
-        draft=false
-      );
+      draw_kv260_atrover_mini();
+      
     // --------------------------------------------------
     if(draft_kv260_enclosure) {
       // ------------------------------------------------------------
@@ -408,7 +435,44 @@ difference() {
     translate([-500, 0, 0])
       cube(1000, center=true);
   }
-  if(caster_test) {
+  if(perimeters_test) {
+    translate([0,0,max_z/2-base_wall_width+first_layer_height])
+      cube([1.2*base_width, 1.2*base_length, max_z], center=true);
     
+    translate([0, 0, -1.5*base_wall_width])
+      cube([base_width-ptr_2lines, base_length-ptr_2lines, 3*base_wall_width], center=true);
+  }
+  if(dims_test) {
+    difference() {
+      cube([2*base_width, 2*base_length, max_z], center=true);
+      translate([0,0,-2*base_wall_width])
+        cube([base_width, base_length, 45], center=true);
+    }
+  }
+  if(full_caster_test || bearing_caster_test) {
+    z_offset = (full_caster_test) ? (200) : (60);
+    
+    difference() {
+      cube([2*base_width, 2*base_length, max_z], center=true);
+      translate([base_width/2+60,-base_length/2-65,-2*base_wall_width])
+        cube([base_width, base_length, z_offset], center=true);
+    }
+    if(half_model)
+      translate([base_width/2+83,-base_length/2-60,-2*base_wall_width])
+        cube([base_width, base_length, z_offset], center=true);
+  }
+  if(bat_holder_test) {
+    
+  }
+  if(motor_enclosure_test) {
+    z_offset = 200;
+    difference() {
+      cube([2*base_width, 2*base_length, max_z], center=true);
+      translate([base_width/2+55,base_length/2-42.5,-2*base_wall_width])
+        cube([base_width, 46, z_offset], center=true);
+    }
+    if(half_model)
+      translate([base_width/2+83,-base_length/2-60,-2*base_wall_width])
+        cube([base_width, base_length, z_offset], center=true);
   }
 }
