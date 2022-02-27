@@ -2,11 +2,14 @@
 include<../modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
 function KV260_enclosure_dims() = [
-  140, // box_l
-  120, // box_w
-   36, // box_h
-    6, // box_bt_h
-   12, // cap_h
+  // xy plane
+  140+1.5, // box_l
+  120+2,   // box_w
+  
+  // z plane
+  z_dim_adj(36), // box_h
+  z_dim_adj(6),  // box_bt_h
+  z_dim_adj(12), // lid_h
 ];
 
 module KV260_enclosure(
@@ -15,19 +18,14 @@ module KV260_enclosure(
   wall_width=ptr_wall_width
 )
 {
+  echo("----------------------------------------------------------------------------------------------------------------------------------------------------");
   dims = KV260_enclosure_dims();
   box_l = dims[0];
   box_w = dims[1];
   box_h = dims[2];
   box_bt_h = dims[3];
-  cap_h = dims[4];
+  lid_h = dims[4];
   
-  box_l_adj = xy_dim_adj(box_l);
-  box_w_adj = xy_dim_adj(box_w);
-  box_h_adj = z_dim_adj(box_h);
-  box_bt_h_adj = z_dim_adj(box_bt_h);
-  cap_h_adj = z_dim_adj(cap_h);
-
   screws_hd = 5.55;
   screws_hh = 2.38;
   screws_hd_offset = first_layer_height+1*layer_height;
@@ -36,9 +34,9 @@ module KV260_enclosure(
   screws_y_wall_offset_cnt = 10;
   screws_xy = [
     [                screws_x_wall_offset_cnt*wall_width,               screws_y_wall_offset_cnt*wall_width],
-    [box_l_adj - (screws_x_wall_offset_cnt/2)*wall_width,               screws_y_wall_offset_cnt*wall_width],
-    [                screws_x_wall_offset_cnt*wall_width, box_w_adj-(screws_y_wall_offset_cnt/2)*wall_width],
-    [box_l_adj - (screws_x_wall_offset_cnt/2)*wall_width, box_w_adj-(screws_y_wall_offset_cnt/2)*wall_width]
+    [box_l - (screws_x_wall_offset_cnt/2)*wall_width,               screws_y_wall_offset_cnt*wall_width],
+    [                screws_x_wall_offset_cnt*wall_width, box_w-(screws_y_wall_offset_cnt/2)*wall_width],
+    [box_l - (screws_x_wall_offset_cnt/2)*wall_width, box_w-(screws_y_wall_offset_cnt/2)*wall_width]
   ];
   echo(screws_xy=screws_xy);
   
@@ -47,19 +45,19 @@ module KV260_enclosure(
   
   if(draw_bottom) {
     difference() {
-      cube([box_l_adj+2*wall_width, box_w_adj+2*wall_width, box_h_adj+bottom_width]);
+      cube([box_l+2*wall_width, box_w+2*wall_width, box_h+bottom_width]);
       union() {
         translate([wall_width, wall_width, bottom_width])
-          cube([box_l_adj, box_w_adj, box_h_adj+bottom_width]);
+          cube([box_l, box_w, box_h+bottom_width]);
         
-        translate([xy_dim_adj(12)+wall_width, -wall_width, bottom_width+box_bt_h_adj])
-          cube([xy_dim_adj(118), 3*wall_width, box_h_adj+bottom_width]);
+        translate([xy_dim_adj(12)+wall_width, -wall_width, bottom_width+box_bt_h])
+          cube([xy_dim_adj(118), 3*wall_width, box_h+bottom_width]);
           
-        translate([xy_dim_adj(22)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+        translate([xy_dim_adj(22)+wall_width, box_w, bottom_width+box_bt_h])
           cube([xy_dim_adj(14), 3*wall_width, z_dim_adj(2+2)]);
-        translate([xy_dim_adj(80)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+        translate([xy_dim_adj(80)+wall_width, box_w, bottom_width+box_bt_h])
           cube([xy_dim_adj(10), 3*wall_width, z_dim_adj(3+2)]);
-        translate([xy_dim_adj(98)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
+        translate([xy_dim_adj(98)+wall_width, box_w, bottom_width+box_bt_h])
           cube([xy_dim_adj(18), 3*wall_width, z_dim_adj(5+2)]);
         
         for(xy = screws_xy) {
@@ -84,14 +82,14 @@ module KV260_enclosure(
     cap_fan_d = 48;
     cap_fan_x_offset = 47.5;
     cap_fan_y_offset = 61;
-    translate([0, -box_w_adj-4*wall_width, 0])
+    translate([0, -box_w-4*wall_width, 0])
     difference() {
       translate([-wall_width, -wall_width, 0])
-        cube([box_l_adj+4*wall_width, box_w_adj+4*wall_width, cap_h_adj+bottom_width]);
+        cube([box_l+4*wall_width, box_w+4*wall_width, lid_h_adj+bottom_width]);
       translate([0, 0, bottom_width])
-        cube([box_l_adj+2*wall_width, box_w_adj+2*wall_width, cap_h_adj+2*bottom_width]);
+        cube([box_l+2*wall_width, box_w+2*wall_width, lid_h_adj+2*bottom_width]);
       translate([cap_fan_x_offset, cap_fan_y_offset, -bottom_width])
-        cylinder(d=cap_fan_d, h=box_h_adj+2*bottom_width);
+        cylinder(d=cap_fan_d, h=box_h+2*bottom_width);
         
       // CAM screws
       translate([32, 5, 0]) {
