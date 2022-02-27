@@ -28,7 +28,8 @@ module rear_motors_wheels(
             full_support=false,
             full_enclosure_wall_width=wall_width,
             render_motor=motor,
-            enclosure_wall_width=4
+            enclosure_wall_width=4,
+            tolerance=tolerance
           );
           *translate([192, 0, 0])
             cube(300, center=true);

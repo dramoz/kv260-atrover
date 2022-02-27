@@ -1,4 +1,6 @@
 
+// TODO: add function to get match wall_width
+
 first_layer_height = 0.4;
 layer_height = 0.6;
 
