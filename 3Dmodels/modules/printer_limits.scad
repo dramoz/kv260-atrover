@@ -2,10 +2,13 @@
 // TODO: add function to get match wall_width
 
 first_layer_height = 0.4;
+min_layer_height = 0.3;
 layer_height = 0.6;
 
-bottom_width = first_layer_height + 3*layer_height;
-top_width = 2*layer_height;
+ptr_bottom_wall_width = first_layer_height + 3*layer_height;
+ptr_top_wall_width = 2*layer_height;
+ptr_tolerance = min_layer_height/2;
+
 // lines: width (mm)
 ptr_2lines = 1.67;
 ptr_3lines = 2.44;

@@ -23,7 +23,7 @@ module motor_mount_GM37_simple(
   vertical_print=false,
   tolerance = 0.5
 ){
-  $fn=100;
+  $fn=50;
   
   gear_diameter = 37;
   gear_length = 24;
@@ -72,10 +72,16 @@ module motor_mount_GM37_simple(
   
   module gm37_motor() {
     // Based on lukas@chihaimotor.cn
+    $fn = 17;
+    cube_adj = 0.4*body_diameter+tolerance;
     translate([0, 0, body_length]) {
       // gear
       cylinder(d=gear_diameter+tolerance,h=gear_length);
-      // boy
+      translate([-15, 0, 0])
+        rotate([0, 0, 45])
+          translate([-cube_adj/2, -cube_adj/2, -body_length])
+            cube([cube_adj, cube_adj, gear_length+body_length]);
+      // body
       translate([0, 0, -body_length+tolerance])
         cylinder(d=body_diameter+tolerance, h=body_length);
       // shaft

@@ -1,75 +1,71 @@
 // ----------------------------------------------------------------------------------
 include<../modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
-function KV260_enclosure_dims() = [
-  // xy plane
-  140+1.5, // box_l
-  120+2,   // box_w
+// DIMENSIONS
+kv260_enclosure_l = 140+1.5;
+kv260_enclosure_w = 120+2;
   
-  // z plane
-  z_dim_adj(36), // box_h
-  z_dim_adj(6),  // box_bt_h
-  z_dim_adj(12), // lid_h
+// z plane
+kv260_enclosure_h = z_dim_adj(36);
+kv260_enclosure_bt_h = z_dim_adj(6);
+kv260_enclosure_lid_h = z_dim_adj(12);
+
+kv260_enclosure_wall_width = ptr_wall_width;
+kv260_enclosure_bottom_wall_width = ptr_bottom_wall_width;
+
+_kv260_encl_screws_x_wall_offset_cnt = 20;
+_kv260_encl_screws_y_wall_offset_cnt = 10;
+kv260_enclosure_screws_xy = [
+  [                _kv260_encl_screws_x_wall_offset_cnt*kv260_enclosure_wall_width,               _kv260_encl_screws_y_wall_offset_cnt*kv260_enclosure_wall_width],
+  [kv260_enclosure_l - (_kv260_encl_screws_x_wall_offset_cnt/2)*kv260_enclosure_wall_width,               _kv260_encl_screws_y_wall_offset_cnt*kv260_enclosure_wall_width],
+  [                _kv260_encl_screws_x_wall_offset_cnt*kv260_enclosure_wall_width, kv260_enclosure_w-(_kv260_encl_screws_y_wall_offset_cnt/2)*kv260_enclosure_wall_width],
+  [kv260_enclosure_l - (_kv260_encl_screws_x_wall_offset_cnt/2)*kv260_enclosure_wall_width, kv260_enclosure_w-(_kv260_encl_screws_y_wall_offset_cnt/2)*kv260_enclosure_wall_width]
 ];
 
 module KV260_enclosure(
-  draw_top=true,
-  draw_bottom=true,
-  wall_width=ptr_wall_width
+  draw_top=false,
+  draw_bottom=false,
+  draw_as_close_box=false
 )
 {
   echo("----------------------------------------------------------------------------------------------------------------------------------------------------");
-  dims = KV260_enclosure_dims();
-  box_l = dims[0];
-  box_w = dims[1];
-  box_h = dims[2];
-  box_bt_h = dims[3];
-  lid_h = dims[4];
+  echo("KV260 Enclosure");
   
   screws_hd = 5.55;
   screws_hh = 2.38;
   screws_hd_offset = first_layer_height+1*layer_height;
   screws_d = 3;
-  screws_x_wall_offset_cnt = 20;
-  screws_y_wall_offset_cnt = 10;
-  screws_xy = [
-    [                screws_x_wall_offset_cnt*wall_width,               screws_y_wall_offset_cnt*wall_width],
-    [box_l - (screws_x_wall_offset_cnt/2)*wall_width,               screws_y_wall_offset_cnt*wall_width],
-    [                screws_x_wall_offset_cnt*wall_width, box_w-(screws_y_wall_offset_cnt/2)*wall_width],
-    [box_l - (screws_x_wall_offset_cnt/2)*wall_width, box_w-(screws_y_wall_offset_cnt/2)*wall_width]
-  ];
-  echo(screws_xy=screws_xy);
   
   screws_hd_adj = xy_dim_adj(screws_hd);
   screws_d_adj = xy_dim_adj(screws_d);
   
-  if(draw_bottom) {
+  if(draw_bottom || draw_as_close_box ) {
     difference() {
-      cube([box_l+2*wall_width, box_w+2*wall_width, box_h+bottom_width]);
+      cube([kv260_enclosure_l+2*kv260_enclosure_wall_width, kv260_enclosure_w+2*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
       union() {
-        translate([wall_width, wall_width, bottom_width])
-          cube([box_l, box_w, box_h+bottom_width]);
+        translate([kv260_enclosure_wall_width, kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width])
+          cube([kv260_enclosure_l, kv260_enclosure_w, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
         
-        translate([xy_dim_adj(12)+wall_width, -wall_width, bottom_width+box_bt_h])
-          cube([xy_dim_adj(118), 3*wall_width, box_h+bottom_width]);
+        translate([xy_dim_adj(12)+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([xy_dim_adj(118), 3*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
           
-        translate([xy_dim_adj(22)+wall_width, box_w, bottom_width+box_bt_h])
-          cube([xy_dim_adj(14), 3*wall_width, z_dim_adj(2+2)]);
-        translate([xy_dim_adj(80)+wall_width, box_w, bottom_width+box_bt_h])
-          cube([xy_dim_adj(10), 3*wall_width, z_dim_adj(3+2)]);
-        translate([xy_dim_adj(98)+wall_width, box_w, bottom_width+box_bt_h])
-          cube([xy_dim_adj(18), 3*wall_width, z_dim_adj(5+2)]);
+        translate([xy_dim_adj(22)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([xy_dim_adj(14), 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
+        translate([xy_dim_adj(80)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([xy_dim_adj(10), 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
+        translate([xy_dim_adj(98)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([xy_dim_adj(18), 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
         
-        for(xy = screws_xy) {
+        for(xy = kv260_enclosure_screws_xy) {
           translate([xy[0], xy[1], screws_hd_offset])
-            cylinder(h=bottom_width, d=screws_hd_adj, $fn=50, center=false);
+            cylinder(h=kv260_enclosure_bottom_wall_width, d=screws_hd_adj, $fn=50, center=false);
           translate([xy[0], xy[1], 0])
-            cylinder(h=3*bottom_width, d=screws_d_adj, $fn=50, center=true);
+            cylinder(h=3*kv260_enclosure_bottom_wall_width, d=screws_d_adj, $fn=50, center=true);
         }
       }
     }
   }
-  if(draw_top) {
+  if(draw_top || draw_as_close_box) {
     // CAM screws
     cam_screws_hh = 2.38;
     cam_screws_d = 3;
@@ -82,43 +78,53 @@ module KV260_enclosure(
     cap_fan_d = 48;
     cap_fan_x_offset = 47.5;
     cap_fan_y_offset = 61;
-    translate([0, -box_w-4*wall_width, 0])
+    
+    rotate_ang = (draw_as_close_box) ? ([0, 180, 0]) : ([0, 0, 0]);
+    translate_xzy = (draw_as_close_box) ? ([-kv260_enclosure_l-2*kv260_enclosure_wall_width, 0, -2*kv260_enclosure_bottom_wall_width-kv260_enclosure_h-ptr_tolerance]) : ([0, -kv260_enclosure_w-4*kv260_enclosure_wall_width, 0]);
+    rotate(rotate_ang)
+    translate(translate_xzy)
     difference() {
-      translate([-wall_width, -wall_width, 0])
-        cube([box_l+4*wall_width, box_w+4*wall_width, lid_h_adj+bottom_width]);
-      translate([0, 0, bottom_width])
-        cube([box_l+2*wall_width, box_w+2*wall_width, lid_h_adj+2*bottom_width]);
-      translate([cap_fan_x_offset, cap_fan_y_offset, -bottom_width])
-        cylinder(d=cap_fan_d, h=box_h+2*bottom_width);
-        
+      translate([-kv260_enclosure_wall_width, -kv260_enclosure_wall_width, 0])
+        cube([kv260_enclosure_l+4*kv260_enclosure_wall_width, kv260_enclosure_w+4*kv260_enclosure_wall_width, kv260_enclosure_lid_h+kv260_enclosure_bottom_wall_width]);
+      translate([0, 0, kv260_enclosure_bottom_wall_width])
+        cube([kv260_enclosure_l+2*kv260_enclosure_wall_width, kv260_enclosure_w+2*kv260_enclosure_wall_width, kv260_enclosure_lid_h+2*kv260_enclosure_bottom_wall_width]);
+      translate([cap_fan_x_offset, cap_fan_y_offset, -kv260_enclosure_bottom_wall_width])
+        cylinder(d=cap_fan_d, h=kv260_enclosure_h+2*kv260_enclosure_bottom_wall_width);
+      
       // CAM screws
-      translate([32, 5, 0]) {
-        for(xy = cam_screws_xy) {
-            translate([xy[0], xy[1]-3, 0])
-              cylinder(h=4*bottom_width, d=screws_d_adj, $fn=50, center=true);
-        }
-      }
-      translate([32, 100, 0]) {
-        for(xy = cam_screws_xy) {
-            translate([xy[0], xy[1]-3, 0])
-              cylinder(h=4*bottom_width, d=screws_d_adj, $fn=50, center=true);
-        }
-      }
-      // DOF screws
       translate([125, 20, 0]) {
         for(xy = cam_screws_xy) {
             translate([xy[1]-3, xy[0], 0])
-              cylinder(h=4*bottom_width, d=screws_d_adj, $fn=50, center=true);
+              cylinder(h=4*kv260_enclosure_bottom_wall_width, d=screws_d_adj, $fn=50, center=true);
         }
       }
-      translate([0, 20, 0]) {
+      
+      // CAM screws
+      *translate([32, 5, 0]) {
+        for(xy = cam_screws_xy) {
+            translate([xy[0], xy[1]-3, 0])
+              cylinder(h=4*kv260_enclosure_bottom_wall_width, d=screws_d_adj, $fn=50, center=true);
+        }
+      }
+      *translate([32, 100, 0]) {
+        for(xy = cam_screws_xy) {
+            translate([xy[0], xy[1]-3, 0])
+              cylinder(h=4*kv260_enclosure_bottom_wall_width, d=screws_d_adj, $fn=50, center=true);
+        }
+      }
+      *translate([0, 20, 0]) {
         for(xy = cam_screws_xy) {
             translate([xy[1]-3, xy[0], 0])
-              cylinder(h=4*bottom_width, d=screws_d_adj, $fn=50, center=true);
+              cylinder(h=4*kv260_enclosure_bottom_wall_width, d=screws_d_adj, $fn=50, center=true);
         }
       }
     }
   }
 }
 
-KV260_enclosure(draw_top=true, draw_bottom=true);
+difference() {
+  //KV260_enclosure(draw_as_close_box=true);
+  KV260_enclosure(draw_top=true, draw_bottom=false);
+  *translate([kv260_enclosure_l/2, -10, -10])
+    cube(500);
+}
