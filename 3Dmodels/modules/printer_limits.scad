@@ -30,3 +30,7 @@ max_printable_width = min(max_x-min_x, max_y-min_y);
 
 function xy_dim_adj(x) = ceil(x/ptr_wall_width)*ptr_wall_width;
 function  z_dim_adj(z) = ceil(z/layer_height)*layer_height;
+
+// screws diameters with tolerances
+xy_screw_3mm_d = 3.2;
+z_screw_3mm_d = 3.35;
