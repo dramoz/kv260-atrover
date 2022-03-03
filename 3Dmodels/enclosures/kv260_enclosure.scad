@@ -8,7 +8,7 @@ kv260_enclosure_w = 120+2;
   
 // z plane
 kv260_enclosure_h = z_dim_adj(36);
-kv260_enclosure_bt_h = z_dim_adj(6);
+kv260_enclosure_board_bt_clearance = z_dim_adj(6);
 kv260_enclosure_lid_h = z_dim_adj(12);
 
 kv260_enclosure_wall_width = ptr_wall_width;
@@ -43,17 +43,17 @@ module KV260_enclosure(
       );
       union() {
         // Front ports (Ethernet/USB/HDMI/DisplayPort/PWR)
-        translate([12+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+        translate([12+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
           cube([118, 3*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
         
         // microSD  
-        translate([24+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+        translate([24+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
           cube([14, 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
         // Micro-USB
-        translate([80+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+        translate([80+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
           cube([11, 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
         // P-mod
-        translate([99+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+        translate([99+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
           cube([18, 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
       }
     }
@@ -67,9 +67,9 @@ module KV260_enclosure(
       [ 60, 13],
     ];
     
-    // cap
+    // Fan
     cap_fan_d = 48;
-    cap_fan_x_offset = 47.5;
+    cap_fan_x_offset = 46.5;
     cap_fan_y_offset = 61;
     
     rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
@@ -83,13 +83,14 @@ module KV260_enclosure(
         tolerance=ptr_tolerance
       );
       
+      // Fan socket
       translate([cap_fan_x_offset, cap_fan_y_offset, -kv260_enclosure_bottom_wall_width])
         cylinder(d=cap_fan_d, h=kv260_enclosure_h+2*kv260_enclosure_bottom_wall_width);
       
       // CAM screws
-      translate([125, 20, 0]) {
+      translate([kv260_enclosure_l-13-10, 20, 0]) {
         for(xy = cam_screws_xy) {
-            translate([xy[1]-3, xy[0], 0])
+            translate([xy[1], xy[0], 0])
               cylinder(h=4*kv260_enclosure_bottom_wall_width, d=xy_screw_3mm_d, $fn=50, center=true);
         }
       }
@@ -97,7 +98,7 @@ module KV260_enclosure(
   }
 }
 
-*difference() {
+difference() {
   //KV260_enclosure(draw_as_close_box=true);
   KV260_enclosure(draw_lid=true, draw_container=false);
   //KV260_enclosure(draw_lid=false, draw_container=true);
