@@ -72,8 +72,8 @@ module KV260_enclosure(
     cap_fan_x_offset = 47.5;
     cap_fan_y_offset = 61;
     
-    //rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
-    //  translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=kv260_enclosure_l, width=kv260_enclosure_w, height=kv260_enclosure_h, xy_wall_width=kv260_enclosure_wall_width, z_wall_width=kv260_enclosure_bottom_wall_width))
+    rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
+      translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=kv260_enclosure_l, width=kv260_enclosure_w, height=kv260_enclosure_h, xy_wall_width=kv260_enclosure_wall_width, z_wall_width=kv260_enclosure_bottom_wall_width))
     difference() {
       enclosure_box(
         length=kv260_enclosure_l, width=kv260_enclosure_w, height=kv260_enclosure_h, lid_height=kv260_enclosure_lid_h,
