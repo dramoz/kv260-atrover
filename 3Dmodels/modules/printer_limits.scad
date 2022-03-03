@@ -1,11 +1,10 @@
 
 // TODO: add function to get match wall_width
 
-first_layer_height = 0.4;
+first_layer_height = 0.3;
 min_layer_height = 0.3;
 layer_height = 0.6;
 
-ptr_bottom_wall_width = first_layer_height + 3*layer_height;
 ptr_top_wall_width = 2*layer_height;
 ptr_tolerance = min_layer_height/2;
 
@@ -29,7 +28,7 @@ max_printable_length = max(max_x-min_x, max_y-min_y);
 max_printable_width = min(max_x-min_x, max_y-min_y);
 
 function xy_dim_adj(x) = ceil(x/ptr_wall_width)*ptr_wall_width;
-function  z_dim_adj(z) = ceil(z/layer_height)*layer_height;
+function  z_dim_adj(z) = ceil((z-first_layer_height)/min_layer_height)*min_layer_height + first_layer_height;
 
 // screws diameters with tolerances
 xy_screw_3mm_d = 3.2;

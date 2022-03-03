@@ -12,7 +12,6 @@
 include<./modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
 use<./modules/wheel.scad>
-use<./modules/motor_mount_GM37.scad>
 use<./modules/caster.scad>
 // ----------------------------------------------------------------------------------
 include<kv260_atrover_mini_dims.scad>
@@ -404,7 +403,7 @@ difference() {
         color("blue", alpha=0.25)
         translate([kv260_x_trans, kv260_y_trans, kv260_z_trans])
           rotate([0,0,90])
-            KV260_enclosure(draw_top=false, draw_bottom=false, draw_as_close_box=true);
+            KV260_enclosure(draw_as_close_box=true);
     }
     // --------------------------------------------------
     if(draft_guides) {

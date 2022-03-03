@@ -12,7 +12,7 @@ kv260_enclosure_bt_h = z_dim_adj(6);
 kv260_enclosure_lid_h = z_dim_adj(12);
 
 kv260_enclosure_wall_width = ptr_wall_width;
-kv260_enclosure_bottom_wall_width = ptr_bottom_wall_width;
+kv260_enclosure_bottom_wall_width = z_dim_adj(2);
 
 _kv260_encl_screws_x_wall_offset_cnt = 20;
 _kv260_encl_screws_y_wall_offset_cnt = 10;
@@ -42,16 +42,19 @@ module KV260_enclosure(
         tolerance=ptr_tolerance
       );
       union() {
-        translate([xy_dim_adj(12)+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
-          cube([xy_dim_adj(118), 3*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
-          
-        translate([xy_dim_adj(22)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
-          cube([xy_dim_adj(14), 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
-        translate([xy_dim_adj(80)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
-          cube([xy_dim_adj(10), 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
-        translate([xy_dim_adj(98)+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
-          cube([xy_dim_adj(18), 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
+        // Front ports (Ethernet/USB/HDMI/DisplayPort/PWR)
+        translate([12+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([118, 3*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
         
+        // microSD  
+        translate([24+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([14, 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
+        // Micro-USB
+        translate([80+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([11, 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
+        // P-mod
+        translate([99+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_bt_h])
+          cube([18, 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
       }
     }
   }
@@ -69,10 +72,8 @@ module KV260_enclosure(
     cap_fan_x_offset = 47.5;
     cap_fan_y_offset = 61;
     
-    rotate_ang = enclosure_close_box_rotate_ang(draw_as_close_box);
-    translate_xzy = (draw_as_close_box) ? ([-length-2*xy_wall_width, 0, -2*z_wall_width-height-tolerance]) : ([0, -width-4*xy_wall_width, 0]);
-    rotate(rotate_ang)
-    translate(translate_xzy)
+    //rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
+    //  translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=kv260_enclosure_l, width=kv260_enclosure_w, height=kv260_enclosure_h, xy_wall_width=kv260_enclosure_wall_width, z_wall_width=kv260_enclosure_bottom_wall_width))
     difference() {
       enclosure_box(
         length=kv260_enclosure_l, width=kv260_enclosure_w, height=kv260_enclosure_h, lid_height=kv260_enclosure_lid_h,
@@ -96,10 +97,10 @@ module KV260_enclosure(
   }
 }
 
-difference() {
-  KV260_enclosure(draw_as_close_box=true);
-  //KV260_enclosure(draw_lid=true, draw_container=false);
-  //KV260_enclosure(draw_lid=true, draw_container=true);
+*difference() {
+  //KV260_enclosure(draw_as_close_box=true);
+  KV260_enclosure(draw_lid=true, draw_container=false);
+  //KV260_enclosure(draw_lid=false, draw_container=true);
   *translate([kv260_enclosure_l/2, -10, -10])
     cube(500);
 }

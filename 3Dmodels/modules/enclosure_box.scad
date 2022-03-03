@@ -6,7 +6,7 @@ function enclosure_close_box_lid_rotate_ang(draw_as_close_box=false) =
     ([0, 180, 0])
   : ([0, 0, 0]);
                                                                                    
-function enclosure_close_box_lid_translate_xyz(draw_as_close_box=false, length=50, width=40, height=15, xy_wall_width=ptr_wall_width, z_wall_width=ptr_bottom_wall_width, tolerance=ptr_tolerance) =
+function enclosure_close_box_lid_translate_xyz(draw_as_close_box=false, length=50, width=40, height=15, xy_wall_width=ptr_wall_width, z_wall_width=z_dim_adj(1), tolerance=ptr_tolerance) =
   (draw_as_close_box) ?
     ([-length-2*xy_wall_width, 0, -2*z_wall_width-height-tolerance])
   : ([0, -width-4*xy_wall_width, 0]);
@@ -17,7 +17,7 @@ module enclosure_box(
   height=15,
   lid_height=5,
   xy_wall_width=ptr_wall_width,
-  z_wall_width=ptr_bottom_wall_width,
+  z_wall_width=z_dim_adj(1),
   fitted_lid=true,
   draw_lid=false,
   draw_container=false,
@@ -72,7 +72,7 @@ module enclosure_box(
   }
 }
 
-if(true) {
+if(false) {
   enclosure_box(draw_container=true);
   rotate(enclosure_close_box_lid_rotate_ang(false))
     translate(enclosure_close_box_lid_translate_xyz(false))
