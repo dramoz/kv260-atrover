@@ -32,4 +32,4 @@ function  z_dim_adj(z) = ceil((z-first_layer_height)/min_layer_height)*min_layer
 
 // screws diameters with tolerances
 xy_screw_3mm_d = 3.2;
-z_screw_3mm_d = 3.35;
+z_screw_3mm_d = z_dim_adj(3.3);

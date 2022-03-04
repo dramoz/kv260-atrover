@@ -13,15 +13,10 @@ stereocam_riser = true;
 stereocam_riser_h = z_dim_adj(30);
 
 stereocam_l = 80.5;
-stereocam_w = 24.5;
+stereocam_w = 22.5;
 stereocam_h = z_dim_adj(12);
 stereocam_board_bt_clearance = z_dim_adj(2.60);
 stereocam_lid_h = z_dim_adj(6);
-stereocam_screws_z_offset = z_dim_adj(stereocam_h/2);
-stereocam_screws_z = [
-    [ 25, 13],
-    [ 60, 13],
-];
 
 // -> Enable for a high-res printing ONLY
 // !!! untested after latest adjustments
@@ -34,6 +29,21 @@ _post_xy = [
   [stereocam_l+2*stereocam_wall_width - _post_wall_offset,                              _post_wall_offset],
   [                             _post_wall_offset, stereocam_w+2*stereocam_wall_width - _post_wall_offset],
   [stereocam_l+2*stereocam_wall_width - _post_wall_offset, stereocam_w+2*stereocam_wall_width - _post_wall_offset]
+];
+
+// ------------------------------------------
+_riser_col_width = 10;
+_t_riser_cols = 6;
+_x_offset = stereocam_l/_t_riser_cols;
+_micro_usb_slot = 9;
+
+// ------------------------------------------
+// Screws
+_stereocam_screws_offset = 3*stereocam_l/(2*_t_riser_cols);
+stereocam_screws_z_offset = z_dim_adj(stereocam_h/2);
+stereocam_screws_z = [
+    [ stereocam_wall_width+_stereocam_screws_offset, 13],
+    [ stereocam_l+stereocam_wall_width-_stereocam_screws_offset, 13],
 ];
 
 module hbv_1780_2_stereocam_enclosure(
@@ -57,8 +67,8 @@ module hbv_1780_2_stereocam_enclosure(
             );
           union() {
             // usb hole
-            translate([xy_dim_adj(stereocam_l/2-4)+stereocam_wall_width, -stereocam_wall_width, stereocam_bottom_width+stereocam_board_bt_clearance])
-              cube([xy_dim_adj(8), 3*stereocam_wall_width, stereocam_h+stereocam_bottom_width]);
+            translate([stereocam_l/2-_micro_usb_slot/2+stereocam_wall_width, -stereocam_wall_width, stereocam_bottom_width+stereocam_board_bt_clearance])
+              cube([_micro_usb_slot, 3*stereocam_wall_width, stereocam_h+stereocam_bottom_width]);
             
             // lateral screws holes
             if(!stereocam_riser) {
@@ -83,11 +93,16 @@ module hbv_1780_2_stereocam_enclosure(
             difference() {
               cube([stereocam_l+2*stereocam_wall_width, stereocam_riser_h+2*stereocam_wall_width, stereocam_h+stereocam_bottom_width]);
               union() {
-                translate([stereocam_wall_width+15, stereocam_wall_width, -stereocam_bottom_width])
-                  cube([50, stereocam_riser_h, stereocam_h+3*stereocam_bottom_width]);
+                for(x=[0:(_t_riser_cols-1)]) {
+                  translate([x*_x_offset+_riser_col_width/_t_riser_cols+stereocam_wall_width, stereocam_wall_width, -stereocam_bottom_width])
+                    cube([_riser_col_width, stereocam_riser_h, stereocam_h+3*stereocam_bottom_width]);
+                }
+                translate([stereocam_l/2-_micro_usb_slot+stereocam_wall_width, stereocam_wall_width, -stereocam_bottom_width])
+                  cube([2*_micro_usb_slot, stereocam_riser_h, stereocam_h+3*stereocam_bottom_width]);
+                  
                 // usb hole
-                translate([xy_dim_adj(stereocam_l/2-4)+stereocam_wall_width, stereocam_riser_h, stereocam_bottom_width+stereocam_board_bt_clearance])
-                  cube([xy_dim_adj(8), 3*stereocam_wall_width, stereocam_h+stereocam_bottom_width]);
+                translate([stereocam_l/2-_micro_usb_slot/2+stereocam_wall_width, stereocam_riser_h, stereocam_bottom_width+stereocam_board_bt_clearance])
+                  cube([_micro_usb_slot, 3*stereocam_wall_width, stereocam_h+stereocam_bottom_width]);
                   
                 // lateral screws holes
                 for(xy = stereocam_screws_z) {

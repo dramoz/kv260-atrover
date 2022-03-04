@@ -1,6 +1,6 @@
+// ----------------------------------------------------------------------------------
 include<printer_limits.scad>
-
-function xy_dim_adj(x) = ceil(x/ptr_wall_width)*ptr_wall_width;
+// ----------------------------------------------------------------------------------
 function enclosure_close_box_lid_rotate_ang(draw_as_close_box=false) =
   (draw_as_close_box) ?
     ([0, 180, 0])
@@ -10,7 +10,7 @@ function enclosure_close_box_lid_translate_xyz(draw_as_close_box=false, length=5
   (draw_as_close_box) ?
     ([-length-2*xy_wall_width, 0, -2*z_wall_width-height-tolerance])
   : ([0, -width-4*xy_wall_width, 0]);
-
+// ----------------------------------------------------------------------------------
 module enclosure_box(
   length=50,
   width=40,
@@ -35,9 +35,11 @@ module enclosure_box(
         translate([xy_wall_width, xy_wall_width, z_wall_width])
           cube([length, width, height+z_wall_width]);
           
-        for(xy = xy_screws[1]) {
-          translate([xy[0], xy[1], 0])
-            cylinder(h=3*xy_wall_width, d=xy_screws[0], $fn=50, center=true);
+        if(xy_screws) {
+          for(xy = xy_screws[1]) {
+            translate([xy[0], xy[1], 0])
+              cylinder(h=3*xy_wall_width, d=xy_screws[0], $fn=50, center=true);
+          }
         }
       }
     }
@@ -71,10 +73,11 @@ module enclosure_box(
     }
   }
 }
-
+// ----------------------------------------------------------------------------------
 if(false) {
   enclosure_box(draw_container=true);
   rotate(enclosure_close_box_lid_rotate_ang(false))
     translate(enclosure_close_box_lid_translate_xyz(false))
       enclosure_box(draw_lid=true, fitted_lid=true);
 }
+// ----------------------------------------------------------------------------------
