@@ -57,15 +57,16 @@ module zk5ad_enclosure(
             tolerance=ptr_tolerance
           );
           // IO socket
-          translate([2*zk5ad_wall_width, 1*zk5ad_wall_width-0.01, -2*zk5ad_bottom_wall_width])
+          //translate([2*zk5ad_wall_width, 1*zk5ad_wall_width-0.01, -2*zk5ad_bottom_wall_width])
+          translate([zk5ad_l+0*zk5ad_wall_width-16, zk5ad_w-2*zk5ad_wall_width+0.01, -2*zk5ad_bottom_wall_width])
             cube([16, 3*zk5ad_wall_width+0.01, zk5ad_h+zk5ad_bottom_wall_width]);
         }
       }
 }
 
-difference() {
-  *zk5ad_enclosure(draw_as_close_box=true);
-  zk5ad_enclosure(draw_lid=true, draw_container=true);
+*difference() {
+  zk5ad_enclosure(draw_as_close_box=true);
+  *zk5ad_enclosure(draw_lid=true, draw_container=true);
   *zk5ad_enclosure(draw_container=true);
   *translate([zk5ad_enclosure_l/2, -10, -10])
     cube(500);

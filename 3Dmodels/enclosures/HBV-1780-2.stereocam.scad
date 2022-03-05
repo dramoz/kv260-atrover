@@ -123,8 +123,8 @@ module hbv_1780_2_stereocam_enclosure(
     cap_w = (stereocam_riser) ? (stereocam_w+stereocam_riser_h)+stereocam_wall_width : (stereocam_w);
     riser_trans = (stereocam_riser && !draw_as_close_box) ? (stereocam_riser_h) : (0);
     rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
-      translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=stereocam_l, width=stereocam_w, height=stereocam_h, xy_wall_width=stereocam_wall_width, z_wall_width=stereocam_board_bt_clearance))
-      translate([0, -riser_trans, 0])
+      translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=stereocam_l, width=stereocam_w, height=stereocam_h, xy_wall_width=stereocam_wall_width, z_wall_width=stereocam_bottom_width))
+      translate([0, -riser_trans, 1])
         difference() {
           enclosure_box(
               length=stereocam_l, width=stereocam_w, height=stereocam_h, lid_height=stereocam_lid_h,
