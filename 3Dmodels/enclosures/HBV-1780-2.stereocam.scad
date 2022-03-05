@@ -60,11 +60,11 @@ module hbv_1780_2_stereocam_enclosure(
       union() {
         difference() {
           enclosure_box(
-              length=stereocam_l, width=stereocam_w, height=stereocam_h, lid_height=stereocam_lid_h,
-              xy_wall_width=stereocam_wall_width, z_wall_width=stereocam_bottom_width,
-              fitted_lid=fitted_lid, draw_container=true,
-              tolerance=ptr_tolerance
-            );
+            length=stereocam_l, width=stereocam_w, height=stereocam_h, lid_height=stereocam_lid_h,
+            xy_wall_width=stereocam_wall_width, z_wall_width=stereocam_bottom_width,
+            fitted_lid=fitted_lid, draw_container=true,
+            tolerance=ptr_tolerance
+          );
           union() {
             // usb hole
             translate([stereocam_l/2-_micro_usb_slot/2+stereocam_wall_width, -stereocam_wall_width, stereocam_bottom_width+stereocam_board_bt_clearance])
@@ -147,7 +147,7 @@ module hbv_1780_2_stereocam_enclosure(
   }
 }
 
-hbv_1780_2_stereocam_enclosure(
+*hbv_1780_2_stereocam_enclosure(
   fitted_lid=true,
   draw_lid=true,
   draw_container=true,

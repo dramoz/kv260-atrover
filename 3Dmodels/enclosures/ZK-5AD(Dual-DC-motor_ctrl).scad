@@ -1,65 +1,72 @@
-first_layer_height = 0.4;
-layer_height = 0.6;
+// ----------------------------------------------------------------------------------
+// Print settings:
+// - Infill: 15% (or less if bridges OK)
+// ----------------------------------------------------------------------------------
+include<../modules/printer_limits.scad>
+use<../modules/enclosure_box.scad>
+// ----------------------------------------------------------------------------------
+// DIMENSIONS
+zk5ad_wall_width = ptr_wall_width;
+zk5ad_bottom_wall_width = z_dim_adj(2);
 
-bottom_width = first_layer_height + 2*layer_height;
-top_width = 2*layer_height;
-wall_width = 1.67;
+zk5ad_l = 39;
+zk5ad_w = 28.5;
+zk5ad_h = z_dim_adj(20);
+zk5ad_board_bt_clearence = z_dim_adj(4);
+zk5ad_lid_h = z_dim_adj(4);
 
-function xy_dim_adj(x) = ceil(x/wall_width)*wall_width;
-function  z_dim_adj(z) = ceil(z/layer_height)*layer_height;
-
-box_l = 39;
-box_w = 28;
-box_h = 16;
-box_bt_h = 4;
-cap_h = 4;
-
-box_l_adj = xy_dim_adj(box_l);
-box_w_adj = xy_dim_adj(box_w);
-box_h_adj = z_dim_adj(box_h);
-box_bt_h_adj = z_dim_adj(box_bt_h);
-cap_h_adj = z_dim_adj(cap_h);
-
-screws_hd = 5.55;
-screws_hh = 2.38;
-screws_hd_offset = first_layer_height;
-screws_d = 3;
-screws_xy = [
-  [            3*wall_width, 3*wall_width],
-  [box_l_adj - 1*wall_width, 3*wall_width],
-  [            3*wall_width, box_w_adj-1*wall_width],
-  [box_l_adj - 1*wall_width, box_w_adj-1*wall_width]
+// ------------------------------------------
+// Screws
+zk5ad_screws_xy = [
+  [            3*zk5ad_wall_width, 3*zk5ad_wall_width],
+  [zk5ad_l - 1*zk5ad_wall_width, 3*zk5ad_wall_width],
+  [            3*zk5ad_wall_width, zk5ad_w-1*zk5ad_wall_width],
+  [zk5ad_l - 1*zk5ad_wall_width, zk5ad_w-1*zk5ad_wall_width]
 ];
 
-screws_hd_adj = xy_dim_adj(screws_hd);
-screws_d_adj = xy_dim_adj(screws_d);
-
-difference() {
-  cube([box_l_adj+2*wall_width, box_w_adj+2*wall_width, box_h_adj+bottom_width]);
-  union() {
-    translate([wall_width, wall_width, bottom_width])
-      cube([box_l_adj, box_w_adj, box_h_adj+bottom_width]);
-    
-    translate([xy_dim_adj(3)+wall_width, box_w_adj, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(16), 3*wall_width, box_h_adj+bottom_width]);
-    translate([xy_dim_adj(1)+wall_width, -wall_width, bottom_width+box_bt_h_adj])
-      cube([xy_dim_adj(36), 3*wall_width, box_h_adj+bottom_width]);
-      
-    for(xy = screws_xy) {
-      translate([xy[0], xy[1], screws_hd_offset])
-        cylinder(h=bottom_width, d=screws_hd_adj, $fn=50, center=false);
-      translate([xy[0], xy[1], 0])
-        cylinder(h=3*bottom_width, d=screws_d_adj, $fn=50, center=true);
+module zk5ad_enclosure(
+  fitted_lid=true,
+  draw_lid=false,
+  draw_container=false,
+  draw_as_close_box=false
+)
+{
+  echo("----------------------------------------------------------------------------------------------------------------------------------------------------");
+  echo("ZK-5AD Dual DC-motor H-Bridge Enclosure");
+  if(draw_container || draw_as_close_box ) {
+    difference() {
+      enclosure_box(
+        length=zk5ad_l, width=zk5ad_w, height=zk5ad_h, lid_height=zk5ad_lid_h,
+        xy_wall_width=zk5ad_wall_width, z_wall_width=zk5ad_bottom_wall_width,
+        fitted_lid=fitted_lid, draw_container=true,
+        xy_screws=[xy_screw_3mm_d, zk5ad_screws_xy],
+        tolerance=ptr_tolerance
+      );
+      translate([1+zk5ad_wall_width, -zk5ad_wall_width, zk5ad_bottom_wall_width+zk5ad_board_bt_clearence])
+        cube([36, 3*zk5ad_wall_width, zk5ad_h+zk5ad_bottom_wall_width]);
     }
-    
   }
+  if(draw_lid || draw_as_close_box) {
+    rotate(enclosure_close_box_lid_rotate_ang(draw_as_close_box))
+      translate(enclosure_close_box_lid_translate_xyz(draw_as_close_box=draw_as_close_box, length=zk5ad_l, width=zk5ad_w, height=zk5ad_h, xy_wall_width=zk5ad_wall_width, z_wall_width=zk5ad_bottom_wall_width))
+        difference() {
+          enclosure_box(
+            length=zk5ad_l, width=zk5ad_w, height=zk5ad_h, lid_height=zk5ad_lid_h,
+            xy_wall_width=zk5ad_wall_width, z_wall_width=zk5ad_bottom_wall_width,
+            fitted_lid=fitted_lid, draw_lid=true,
+            tolerance=ptr_tolerance
+          );
+          // IO socket
+          translate([2*zk5ad_wall_width, 1*zk5ad_wall_width-0.01, -2*zk5ad_bottom_wall_width])
+            cube([16, 3*zk5ad_wall_width+0.01, zk5ad_h+zk5ad_bottom_wall_width]);
+        }
+      }
 }
 
-// cap
-translate([-box_l_adj-4*wall_width, 0, 0])
 difference() {
-  translate([-wall_width, -wall_width, 0])
-    cube([box_l_adj+4*wall_width, box_w_adj+4*wall_width, cap_h_adj+bottom_width]);
-  translate([0, 0, bottom_width])
-    cube([box_l_adj+2*wall_width, box_w_adj+2*wall_width, cap_h_adj+2*bottom_width]);
+  *zk5ad_enclosure(draw_as_close_box=true);
+  zk5ad_enclosure(draw_lid=true, draw_container=true);
+  *zk5ad_enclosure(draw_container=true);
+  *translate([zk5ad_enclosure_l/2, -10, -10])
+    cube(500);
 }
