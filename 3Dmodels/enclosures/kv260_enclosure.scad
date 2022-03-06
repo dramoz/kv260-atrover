@@ -125,7 +125,7 @@ module KV260_enclosure(
   }
 }
 
-difference() {
+*difference() {
   *KV260_enclosure(draw_as_close_box=true, draw_other_enclosures=true);
   KV260_enclosure(draw_lid=true, draw_container=false);
   *KV260_enclosure(draw_lid=false, draw_container=true);

@@ -127,7 +127,7 @@ module simple_bearing(
     }
 }
 
-module caster_bearing(d2=15, h=15, hw=10, shaft_h=30, rod_screw_diameter=10, rod_screw_offset=5, tolerance=0.5, angle=45, wall_width=2.2, draft=false, half=false) {
+module caster_bearing(d2=15, h=15, hw=10, shaft_h=30, shaft_h_offset=0, rod_screw_diameter=10, rod_screw_offset=5, tolerance=0.5, angle=45, wall_width=2.2, draft=false, half=false) {
   translate([0, 0, h/2])
     difference() {
       side = sqrt(2)*d2/2;
@@ -146,16 +146,16 @@ module caster_bearing(d2=15, h=15, hw=10, shaft_h=30, rod_screw_diameter=10, rod
           cube([side, side, shaft_h], center=true);
       }
       if(draft==false) {
-        translate([0, 0, shaft_h-0])
+        translate([0, 0, shaft_h-shaft_h_offset])
           rotate([90, 180, 0]) {
             rod_width = 2*side;
-            cylinder(d=rod_screw_diameter, h=rod_width, center=true, $fn=100);
+            cylinder(d=rod_screw_diameter, h=rod_width, center=true, $fn=18);
             // circle top bearing feature
-            translate([0, -6*rod_screw_diameter/100, 0])
+            translate([0, -12.3*rod_screw_diameter/100, 0])
               rotate([0, 0, 90])
                 difference() {
-                  cylinder(d=rod_screw_diameter, h=rod_width, center=true, $fn=6);
-                  translate([0.7*rod_screw_diameter, 0, 0])
+                  cylinder(d=rod_screw_diameter-1.0, h=rod_width, center=true, $fn=6);
+                  translate([0.69*rod_screw_diameter, 0, 0])
                     cube([2*rod_screw_diameter, 2*rod_screw_diameter, 6*rod_screw_diameter], center=true);
                 }
           }
@@ -168,7 +168,7 @@ module caster_bearing(d2=15, h=15, hw=10, shaft_h=30, rod_screw_diameter=10, rod
     }
 }
 
-caster_bearing(d2=2*18/sqrt(2), h=15, hw=4, shaft_h=30, rod_screw_diameter=10, rod_screw_offset=5, tolerance=0.75, angle=45, wall_width=2.2, half=false);
+*caster_bearing(d2=2*18/sqrt(2), h=15, hw=4, shaft_h=30, rod_screw_diameter=10, rod_screw_offset=5, tolerance=0.75, angle=45, wall_width=2.2, half=false);
 
 /*
 for(hw=[

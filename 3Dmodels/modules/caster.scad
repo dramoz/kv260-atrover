@@ -1,7 +1,5 @@
 use <../ext_modules/threads.scad>
 use <../ext_modules/bearing.scad>
-use <holding_screws.scad>
-use <o_ring.scad>
 use <wheel.scad>
 use <caster_bearing.scad>
 
@@ -11,7 +9,6 @@ module caster(
   wheel_diameter=100,
   wheel_width=15,
   bearing=false,
-  oring_width=2,
   l_wheel=false,
   r_wheel=false,
   wheels_screw=true,
@@ -28,6 +25,7 @@ module caster(
   rod_width=18,
   rod_screw_diameter=12,
   draft=false,
+  wall_width=2,
   tolerance=0.5
 )
 {
@@ -136,27 +134,16 @@ module caster(
   
   // bearing
   if(bearing) {
-    wall_width = 1.1*2;
     translate([rod_screw_zpos, 0, 0])
       rotate([-90, 0, 90]) {
         d2 = bearing_diameter;
         caster_bearing(
           d2=d2, h=bearing_width, hw=4,
-          shaft_h=rod_length+2*tolerance,
+          shaft_h=rod_length+2*tolerance, shaft_h_offset=tolerance,
           rod_screw_diameter=rod_screw_diameter+2*tolerance, rod_screw_offset=rod_screw_offset,
           tolerance=bearing_tolerance, angle=45, wall_width=wall_width,
           draft=draft,
           half=false
-        );
-        o_ring(
-          diameter=2*(bearing_width+d2),
-          inner_diameter=(bearing_width+d2)-0.1,
-          width=oring_width,
-          screws=8,
-          washer_diameter=20,
-          tolerance=tolerance,
-          screw_distance_offset=0,
-          center=false
         );
       }
   }
@@ -173,7 +160,6 @@ module full_caster(
   wheel_tread_depth=5,
   wheel_thickness=6,
   wheel_total_treads = 360/15,
-  oring_width = 3,
   bearing=true,
   l_wheel=true,
   r_wheel=true,
@@ -184,18 +170,18 @@ module full_caster(
   rod_screw_diameter=12,
   bearing_tolerance=1.0,
   draft=false,
+  wall_width=2,
   tolerance=0.5
 )
 {
-  expected_caster_height = back_wheel_diameter/2 + back_wheel_offset - oring_width;
+  expected_caster_height = back_wheel_diameter/2 + back_wheel_offset;
   echo(expected_caster_height=expected_caster_height);
   
-  wheel_diameter = back_wheel_diameter/2 + back_wheel_offset - bearing_width - 5 - oring_width;
+  wheel_diameter = back_wheel_diameter/2 + back_wheel_offset - bearing_width - 5;
   echo(wheel_diameter=wheel_diameter);
   
   caster_height = bearing_width+rod_length-rod_screw_offset-(rod_screw_diameter+2*tolerance)/2;
-  echo(caster_height=caster_height);
-  
+  echo(rod_screw_offset=rod_screw_offset);
   rotate([180, 0, 0])
   translate([0, 0, caster_height])
     union() {
@@ -210,7 +196,6 @@ module full_caster(
         wheel_thickness=wheel_thickness,
         wheel_total_treads=wheel_total_treads,
         bearing=bearing,
-        oring_width=oring_width,
         l_wheel=l_wheel,
         r_wheel=r_wheel,
         wheels_screw=wheels_screw,
@@ -222,6 +207,7 @@ module full_caster(
         rod_width=rod_width,
         rod_screw_diameter=rod_screw_diameter,
         draft=draft,
+        wall_width=wall_width,
         tolerance=tolerance
       );
     }
