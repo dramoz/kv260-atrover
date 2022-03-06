@@ -51,6 +51,10 @@ z_screw_3mm_nut_d  = z_dim_adj(5.50+z_tolerance);
 z_screw_3mm_nut_dd = z_dim_adj(6.35+z_tolerance);
 z_screw_3mm_nut_h  = z_dim_adj(2.55+z_tolerance);
 
+// M4
+xy_screw_4mm_d = 4 + xy_tolerance;
+z_screw_4mm_d  = z_dim_adj(4+z_tolerance);
+
 // M5
 xy_screw_5mm_d = 5 + xy_tolerance;
 z_screw_5mm_d  = z_dim_adj(5+z_tolerance);

@@ -8,6 +8,8 @@
 // +Ultrasonic sensor (front->kv260_enclosure)
 // +IR floor sensor   (front_bottom->kv260_enclosure)
 // -> CAM later
+// + DOF (camera mount?)
+// Cable holders/passthrough for dc motors
 // ----------------------------------------------------------------------------------
 include<./modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
@@ -32,7 +34,7 @@ xy_wall_width = ptr_wall_width;
 draw_base = true;
 draw_motors_support = true;
 draw_base_casters = true;
-draft_battery_enclosure = true;
+draft_battery_enclosure = false;
 
 use_3dprint_casters = false;
 
@@ -49,7 +51,7 @@ dims_test = false;
 bat_enclosure_slot_test = false;
 bat_enclosure_test = false;
 
-full_caster_test = true;
+full_caster_test = false;
 bearing_caster_test = false;
 caster_tolerance = 0.7;
 _caster_rod_screw_offset = 5;
@@ -96,29 +98,34 @@ bat_screws_d = 3.2;
 mounting_screws = [
   // [x, y, d]
   // DC motor cable
-  [-base_width/2+30, -5, 10],
-  [base_width/2-30, -5, 10],
+  [-base_width/2+28, -8, 8],
+  [base_width/2-28, -8, 8],
 ];
 // --------------------------------------------------
 // Caster screws
+_caster_offset = 12;
+_caster_l = 38;
+_caster_w = 32;
+_caster_wheel_d = 41.3;
+_caster_wheel_w = 25;
 _caster_screws_corner_offset = ptr_6lines;
-_base_front_left_corner = [-base_width/2+xy_screw_5mm_d/2+_caster_screws_corner_offset, -base_length/2+xy_screw_5mm_d/2+_caster_screws_corner_offset];
-_base_front_right_corner = [base_width/2-xy_screw_5mm_d/2-_caster_screws_corner_offset, -base_length/2+xy_screw_5mm_d/2+_caster_screws_corner_offset];
-_caster_l_screw_offset = 2+xy_screw_5mm_d/2;
-_caster_l = 38-_caster_l_screw_offset;
-_caster_w = 32-_caster_l_screw_offset;
+_base_front_left_corner = [-base_width/2+xy_screw_4mm_d/2+_caster_screws_corner_offset, -base_length/2+xy_screw_4mm_d/2+_caster_screws_corner_offset];
+_base_front_right_corner = [base_width/2-xy_screw_4mm_d/2-_caster_screws_corner_offset, -base_length/2+xy_screw_4mm_d/2+_caster_screws_corner_offset];
+_caster_l_screw_offset = 2*(2+4/2);
+_caster_screws_l = _caster_l-_caster_l_screw_offset;
+_caster_screws_w = _caster_w-_caster_l_screw_offset;
 caster_screws = [  
   // Left caster
-  [_base_front_left_corner[0]+0*_caster_w, _base_front_left_corner[1]+0*_caster_l, xy_screw_5mm_d],
-  [_base_front_left_corner[0]+0*_caster_w, _base_front_left_corner[1]+1*_caster_l, xy_screw_5mm_d],
-  [_base_front_left_corner[0]+1*_caster_w, _base_front_left_corner[1]+0*_caster_l, xy_screw_5mm_d],
-  [_base_front_left_corner[0]+1*_caster_w, _base_front_left_corner[1]+1*_caster_l, xy_screw_5mm_d],
+  [_base_front_left_corner[0]+0*_caster_screws_w, _base_front_left_corner[1]+0*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_left_corner[0]+0*_caster_screws_w, _base_front_left_corner[1]+1*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_left_corner[0]+1*_caster_screws_w, _base_front_left_corner[1]+0*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_left_corner[0]+1*_caster_screws_w, _base_front_left_corner[1]+1*_caster_screws_l, xy_screw_4mm_d],
   
   // Right Caster
-  [_base_front_right_corner[0]-0*_caster_w, _base_front_right_corner[1]+0*_caster_l, xy_screw_5mm_d],
-  [_base_front_right_corner[0]-0*_caster_w, _base_front_right_corner[1]+1*_caster_l, xy_screw_5mm_d],
-  [_base_front_right_corner[0]-1*_caster_w, _base_front_right_corner[1]+0*_caster_l, xy_screw_5mm_d],
-  [_base_front_right_corner[0]-1*_caster_w, _base_front_right_corner[1]+1*_caster_l, xy_screw_5mm_d],
+  [_base_front_right_corner[0]-0*_caster_screws_w, _base_front_right_corner[1]+0*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_right_corner[0]-0*_caster_screws_w, _base_front_right_corner[1]+1*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_right_corner[0]-1*_caster_screws_w, _base_front_right_corner[1]+0*_caster_screws_l, xy_screw_4mm_d],
+  [_base_front_right_corner[0]-1*_caster_screws_w, _base_front_right_corner[1]+1*_caster_screws_l, xy_screw_4mm_d],
 ];
 // --------------------------------------------------
 atrover_passthough_holes = concat(mounting_screws, caster_screws);
@@ -254,8 +261,7 @@ module kv260_atrover_mini(
               }
             }
             else {
-            // Screws for regular casters
-            
+              // Nothing to do here for regular casters
             }
           }
       }
@@ -278,7 +284,8 @@ module kv260_atrover_mini(
                 );
         }
       }
-      if(_draw_base_casters && use_3dprint_casters) {
+      if(_draw_base_casters) {
+        if(use_3dprint_casters) {
         // front casters
         //color("green", alpha=0.15)
           for(m=[0:1]) {
@@ -313,36 +320,57 @@ module kv260_atrover_mini(
                       cube(100, center=true);
                 }
           }
-        
-        if(botttom_supports) {
-          vaccum_offset = -20;
-          vaccum_d = 140;
-          difference() {
-              union() {
-              // circumference
-              translate([0, vaccum_offset, -enclosure_depth])
-                  cylinder(d=vaccum_d+2*xy_wall_width, h=enclosure_depth);
-                  
-              // squares
-              translate([0, -bottom_rear_front_distance/2+25, -enclosure_depth/2])
-                  cube([base_width, bottom_rear_front_distance, enclosure_depth], center=true);
-              translate([0, -bottom_rear_front_distance, -enclosure_depth/2])
-                  cube([front_mower_space, 60, enclosure_depth], center=true);
-              }
+        }
+        else {
+          if(_caster_offset>0) {
+            translate([base_width/2-_caster_w-_caster_screws_corner_offset, -base_length/2, -_caster_offset])
+              cube([_caster_w+_caster_screws_corner_offset, _caster_l+_caster_screws_corner_offset, _caster_offset]);
               
-              // circumference
-              translate([0, vaccum_offset, -enclosure_depth-0.01])
-              cylinder(d=vaccum_d, h=1.2*enclosure_depth);
-              // squares
-              translate([0, -bottom_rear_front_distance/2+25, -enclosure_depth/2 -0.01])
-              cube([1.2*base_width, bottom_rear_front_distance-2*xy_wall_width, 1.2*enclosure_depth], center=true);
-              translate([0, -bottom_rear_front_distance, -enclosure_depth/2 -0.01])
-              cube([front_mower_space-2*xy_wall_width, 100, 1.2*enclosure_depth], center=true);
-              translate([0, -base_length/2-10, -enclosure_depth/2 -0.01])
-              cube([base_width, 20, 1.2*enclosure_depth], center=true);
+            translate([-base_width/2, -base_length/2, -_caster_offset])
+              cube([_caster_w+_caster_screws_corner_offset, _caster_l+_caster_screws_corner_offset, _caster_offset]);
+          }
+          color("gray", alpha=0.5)
+          if(draw_wheels) {
+            translate([base_width/2-_caster_wheel_w/2, -base_length/2+_caster_wheel_d/2, -_caster_wheel_d/2-_caster_offset])
+              rotate([0, 90, 0])
+                cylinder(d=_caster_wheel_d, h=_caster_wheel_w, center=true);
+                
+            translate([-base_width/2+_caster_wheel_w/2, -base_length/2+_caster_wheel_d/2, -_caster_wheel_d/2-_caster_offset])
+              rotate([0, 90, 0])
+                cylinder(d=_caster_wheel_d, h=_caster_wheel_w, center=true);
           }
         }
       }
+      
+      if(botttom_supports) {
+        vaccum_offset = -20;
+        vaccum_d = 140;
+        difference() {
+            union() {
+            // circumference
+            translate([0, vaccum_offset, -enclosure_depth])
+                cylinder(d=vaccum_d+2*xy_wall_width, h=enclosure_depth);
+                
+            // squares
+            translate([0, -bottom_rear_front_distance/2+25, -enclosure_depth/2])
+                cube([base_width, bottom_rear_front_distance, enclosure_depth], center=true);
+            translate([0, -bottom_rear_front_distance, -enclosure_depth/2])
+                cube([front_mower_space, 60, enclosure_depth], center=true);
+            }
+            
+            // circumference
+            translate([0, vaccum_offset, -enclosure_depth-0.01])
+            cylinder(d=vaccum_d, h=1.2*enclosure_depth);
+            // squares
+            translate([0, -bottom_rear_front_distance/2+25, -enclosure_depth/2 -0.01])
+            cube([1.2*base_width, bottom_rear_front_distance-2*xy_wall_width, 1.2*enclosure_depth], center=true);
+            translate([0, -bottom_rear_front_distance, -enclosure_depth/2 -0.01])
+            cube([front_mower_space-2*xy_wall_width, 100, 1.2*enclosure_depth], center=true);
+            translate([0, -base_length/2-10, -enclosure_depth/2 -0.01])
+            cube([base_width, 20, 1.2*enclosure_depth], center=true);
+        }
+      }
+      
       if(_draft_battery_enclosure) {
         battery_enclosure();
         
@@ -376,8 +404,8 @@ module kv260_atrover_mini(
     
     // Base holes
     for(xy = atrover_passthough_holes) {
-      translate([xy[0], xy[1], -2*bottom_wall_width])
-        cylinder(h=5*bottom_wall_width, d=xy[2], $fn=50);
+      translate([xy[0], xy[1], -max_z])
+        cylinder(h=2*max_z, d=xy[2], $fn=50);
     }
   }
 }
@@ -460,8 +488,8 @@ difference() {
   // ------------------------------------------------------------
   if(full_caster_test || bearing_caster_test) {
     z_offset = (full_caster_test) ? (200) : (60);
-    w_offset = (full_caster_test) ? ((use_3dprint_casters)?(50):(65-_caster_screws_corner_offset)) : (60);
-    l_offset = (full_caster_test) ? ((use_3dprint_casters)?(55):(65-_caster_screws_corner_offset)) : (65);
+    w_offset = (full_caster_test) ? ((use_3dprint_casters)?(50):(70-_caster_screws_corner_offset)) : (60);
+    l_offset = (full_caster_test) ? ((use_3dprint_casters)?(55):(70-_caster_screws_corner_offset)) : (65);
     difference() {
       cube([2*base_width, 2*base_length, max_z], center=true);
       translate([base_width/2+w_offset,-base_length/2-l_offset,-2*bottom_wall_width])
