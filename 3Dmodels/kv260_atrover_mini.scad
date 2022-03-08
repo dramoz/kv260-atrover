@@ -34,7 +34,7 @@ xy_wall_width = ptr_wall_width;
 draw_base = true;
 draw_motors_support = true;
 draw_base_casters = true;
-draft_battery_enclosure = false;
+draw_battery_enclosure = false;
 
 use_3dprint_casters = false;
 
@@ -48,8 +48,10 @@ draft_kv260_enclosure = false;
 // ---------------------------------------
 perimeters_test = false;
 dims_test = false;
+bat_enclosure_slot_test_chk = false;
 bat_enclosure_slot_test = false;
-bat_enclosure_test = false;
+bat_enclosure_slide_test_chk = false;
+bat_enclosure_slide_test = false;
 
 full_caster_test = false;
 bearing_caster_test = false;
@@ -62,15 +64,17 @@ motor_enclosure_tolerance = 0.35;
 
 half_model = false;
 // ---------------------------------------
-_draw_base = draw_base && !bat_enclosure_test;
-_draw_motors_support = draw_motors_support && !bat_enclosure_test;
-_draw_base_casters = draw_base_casters && !bat_enclosure_test;
-_draft_battery_enclosure = (draft_battery_enclosure || bat_enclosure_test) && !motor_enclosure_test && !bat_enclosure_slot_test;
+_draw_base = (draw_base || bat_enclosure_slot_test_chk || bat_enclosure_slot_test) && !(bat_enclosure_slide_test_chk || bat_enclosure_slide_test);
+_draw_motors_support = draw_motors_support && !(bat_enclosure_slide_test_chk || bat_enclosure_slide_test);
+_draw_base_casters = draw_base_casters && !(bat_enclosure_slide_test_chk || bat_enclosure_slide_test);
+_draw_battery_enclosure = (draw_battery_enclosure || bat_enclosure_slide_test_chk || bat_enclosure_slide_test) && !motor_enclosure_test && !(bat_enclosure_slot_test_chk || bat_enclosure_slot_test);
 _half_model = half_model;
-_bat_case_wall_width = (_draft_battery_enclosure) ? (1.0*ptr_4lines) : (1.2*ptr_4lines);
-_cl_w = (_draft_battery_enclosure) ? (15) : (16);
+_bat_case_xy_wall_width = (_draw_battery_enclosure) ? (1.0*ptr_4lines) : (1.2*ptr_4lines);
+_bat_case_z_tolerance = (_draw_battery_enclosure) ? (0) : (2);
+_bat_case_z_wall_width = z_dim_adj(3);
+_bat_enclosure_vertical_walls_trim_w = (_draw_battery_enclosure) ? (15) : (16);
 
-_rotate_model = !(draft_guides || draft_wheels || draft_motors || _draft_battery_enclosure || draft_battery || draft_kv260_enclosure);
+_rotate_model = !(draft_guides || draft_wheels || draft_motors || _draw_battery_enclosure || draft_battery || draft_kv260_enclosure);
 
 // *********************************************************************************************
 // ----------------------------------------------------------------------------------
@@ -128,7 +132,12 @@ caster_screws = [
   [_base_front_right_corner[0]-1*_caster_screws_w, _base_front_right_corner[1]+1*_caster_screws_l, xy_screw_4mm_d],
 ];
 // --------------------------------------------------
-atrover_passthough_holes = concat(mounting_screws, caster_screws);
+// Rear Left mark
+rear_left_mark = [
+  [-base_width/2+14, base_length/2-10, xy_screw_3mm_d],
+];
+// --------------------------------------------------
+atrover_passthough_holes = concat(mounting_screws, caster_screws, rear_left_mark);
 
 // *********************************************************************************************
 // ----------------------------------------------------------------------------------
@@ -159,57 +168,69 @@ module kv260_atrover_mini(
   
   // ----------------------------------------------------------------------------------
   // Battery case
-  bat_case_l = battery_length + 2*_bat_case_wall_width;
-  bat_case_w = battery_width  + 2*_bat_case_wall_width;
-  bat_case_h = battery_height + 1*_bat_case_wall_width + 2*bottom_wall_width;
-  bat_wall_supports_offset = 4*_bat_case_wall_width;
-  bat_supports_offset = 5*_bat_case_wall_width;
+  bat_case_l = battery_length + 2*_bat_case_xy_wall_width;
+  bat_case_w = battery_width  + 2*_bat_case_xy_wall_width;
+  bat_case_h = battery_height + _bat_case_z_wall_width;
+  bat_wall_supports_offset = 10;
+  bat_wall_supports_lateral_offset = 10;
+  bat_supports_offset = 10;
   bat_supports_xy_size = 25;
-  bat_supports_z_size = 2*bottom_wall_width;
+  bat_supports_z_size = bat_supports_offset+bottom_wall_width+_bat_case_z_tolerance;
   // --------------------------------------------------
   module battery_enclosure() {
-    translate([-bat_case_l/2, base_length/2-bat_case_w+_bat_case_wall_width, -bottom_wall_width])
+    translate([-bat_case_l/2, base_length/2-bat_case_w+_bat_case_xy_wall_width, bottom_wall_width-bat_supports_offset-_bat_case_z_tolerance-_bat_case_z_wall_width])
     difference() {
-      cube([bat_case_l, bat_case_w, bat_case_h]);
-      translate([_bat_case_wall_width, _bat_case_wall_width, -_bat_case_wall_width])
-        cube([battery_length, battery_width, battery_height+_bat_case_wall_width+2*bottom_wall_width]);
+      cube([bat_case_l, bat_case_w, bat_case_h+bat_supports_offset+_bat_case_z_wall_width]);
+      translate([_bat_case_xy_wall_width, _bat_case_xy_wall_width, -_bat_case_z_wall_width])
+        cube([battery_length, battery_width, battery_height+bat_supports_offset+2*_bat_case_z_wall_width]);
       
+      _bat_top_w_offset = bat_case_w/2-1.5*bat_wall_supports_offset;
+      _bat_top_l_offset = bat_case_l/2-1.5*bat_wall_supports_offset;
       for(xy_trans = [
-        [bat_wall_supports_offset,      bat_wall_supports_offset],
-        [bat_wall_supports_offset,      battery_width/2+3*_bat_case_wall_width],
-        [battery_length/2+3*_bat_case_wall_width, bat_wall_supports_offset],
-        [battery_length/2+3*_bat_case_wall_width, battery_width/2+3*_bat_case_wall_width]
+        [bat_wall_supports_offset,     bat_wall_supports_offset],
+        [bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
+        [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset,     bat_wall_supports_offset],
+        [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
       ])
       {
-        xyz_trans = [xy_trans[0], xy_trans[1], bat_case_h-2*_bat_case_wall_width];
+        xyz_trans = [xy_trans[0], xy_trans[1], bat_case_h+bat_supports_offset-_bat_case_z_wall_width];
         translate(xyz_trans)
-          cube([battery_length/2-bat_supports_offset, battery_width/2-bat_supports_offset, 3*_bat_case_wall_width]);
+          cube([_bat_top_l_offset, _bat_top_w_offset, 3*_bat_case_z_wall_width]);
       }
       
-      l_chunk = bat_case_l - 2*_cl_w;
-      translate([_cl_w, -_bat_case_wall_width, -2*bat_wall_supports_offset])
-        cube([l_chunk, 3*_bat_case_wall_width, bat_case_h]);
-      translate([_cl_w, battery_width, -2*bat_wall_supports_offset])
-        cube([l_chunk, 3*_bat_case_wall_width, bat_case_h]);
+      l_chunk = bat_case_l - 2*_bat_enclosure_vertical_walls_trim_w;
+      translate([_bat_enclosure_vertical_walls_trim_w, -_bat_case_xy_wall_width, -bat_wall_supports_lateral_offset])
+        cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
+      translate([_bat_enclosure_vertical_walls_trim_w, battery_width, -bat_wall_supports_lateral_offset])
+        cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
+      
+      w_chunk = bat_case_w - 2*_bat_enclosure_vertical_walls_trim_w;
+      translate([-_bat_case_xy_wall_width, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
+        cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
+      translate([battery_length, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
+        cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
         
-      w_chunk = bat_case_w - 2*_cl_w;
-      translate([-_bat_case_wall_width, _cl_w, -2*bat_wall_supports_offset])
-        cube([3*_bat_case_wall_width, w_chunk, bat_case_h]);
-      translate([battery_length, _cl_w, -2*bat_wall_supports_offset])
-        cube([3*_bat_case_wall_width, w_chunk, bat_case_h]);
+      // PWR terminals
+      _bat_terminal_l = 14;
+      _bat_terminal_w = 12;
+      _bat_terminal_h = 10;
+      translate([_bat_case_xy_wall_width+10, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
+        cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
+      translate([_bat_case_xy_wall_width+10, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
+        cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
     }
   }
   module battery_enclosure_supports() {
     for(xy_trans = [
-      [-bat_case_l/2-2*xy_wall_width                    , base_length/2-bat_case_w-xy_wall_width, bat_supports_xy_size/2, bat_supports_xy_size/2],
-      [bat_case_l/2-bat_supports_xy_size+2*xy_wall_width, base_length/2-bat_case_w-xy_wall_width, -xy_wall_width, bat_supports_xy_size/2],
-      [-bat_case_l/2-2*xy_wall_width                    , base_length/2-bat_supports_xy_size, bat_supports_xy_size/2, -xy_wall_width],
-      [bat_case_l/2-bat_supports_xy_size+2*xy_wall_width, base_length/2-bat_supports_xy_size, -xy_wall_width, -xy_wall_width],
+      [-bat_case_l/2-1.8*xy_wall_width                    , base_length/2-bat_case_w-0.3*xy_wall_width, bat_supports_xy_size/2, bat_supports_xy_size/2],
+      [bat_case_l/2-bat_supports_xy_size+1.9*xy_wall_width, base_length/2-bat_case_w-0.3*xy_wall_width, -xy_wall_width, bat_supports_xy_size/2],
+      //[-bat_case_l/2-2*xy_wall_width                    , base_length/2-bat_supports_xy_size, bat_supports_xy_size/2, -xy_wall_width],
+      //[bat_case_l/2-bat_supports_xy_size+2*xy_wall_width, base_length/2-bat_supports_xy_size, -xy_wall_width, -xy_wall_width],
     ])
     {
       xyz_trans = [xy_trans[0], xy_trans[1], -bat_supports_z_size+xy_wall_width];
       xyz_diff_trans = [xy_trans[2], xy_trans[3], -xy_wall_width];
-      translate(xyz_trans)
+      %translate(xyz_trans)
         difference() {
           cube([bat_supports_xy_size, bat_supports_xy_size, bat_supports_z_size+xy_wall_width]);
           translate(xyz_diff_trans)
@@ -219,16 +240,26 @@ module kv260_atrover_mini(
   }
   module battery_enclosure_screws() {
     screws_xy = [
-      [-bat_case_l/2+(bat_supports_xy_size/2+xy_wall_width)/2, 0],
-      [ bat_case_l/2-(bat_supports_xy_size/2+xy_wall_width)/2, 0],
+      [-bat_case_l/2+(bat_supports_xy_size/2+xy_wall_width)/2, -z_screw_3mm_d],
+      [ bat_case_l/2-(bat_supports_xy_size/2+xy_wall_width)/2, -z_screw_3mm_d],
     ];
-    screw_h = bat_supports_xy_size + 4*xy_wall_width;
+    screw_h = bat_supports_xy_size + 0*xy_wall_width;
     z = base_length/2;
     for(xy = screws_xy) {
       rotate([90, 0, 0])
         translate([xy[0], xy[1], -z])
           union() {
             cylinder(h=screw_h, d=z_screw_3mm_d, $fn=50, center=true);
+            translate([0, -bat_supports_xy_size/2+z_screw_3mm_nut_d/2+2*tolerance, bat_supports_xy_size/4])
+              cube([z_screw_3mm_nut_d, bat_supports_xy_size, z_screw_3mm_nut_h], center=true);
+          }
+    }
+    for(xy = screws_xy) {
+      rotate([90, 0, 0])
+        translate([xy[0], xy[1], -10])
+          union() {
+            translate([0, 0, 12])
+              cylinder(h=screw_h, d=z_screw_3mm_d, $fn=50, center=true);
             translate([0, -bat_supports_xy_size/2+z_screw_3mm_nut_d/2+2*tolerance, bat_supports_xy_size/4])
               cube([z_screw_3mm_nut_d, bat_supports_xy_size, z_screw_3mm_nut_h], center=true);
           }
@@ -371,12 +402,12 @@ module kv260_atrover_mini(
         }
       }
       
-      if(_draft_battery_enclosure) {
+      if(_draw_battery_enclosure) {
         battery_enclosure();
         
         if(draft_battery) {
           %color("blue", alpha=0.1)
-          translate([-bat_case_l/2+xy_wall_width, base_length/2-bat_case_w+2*xy_wall_width, bottom_wall_width])
+          translate([-bat_case_l/2+_bat_case_xy_wall_width, base_length/2-bat_case_w+2*_bat_case_xy_wall_width, bottom_wall_width])
             cube([battery_length, battery_width, battery_height]);
         }
       }
@@ -397,7 +428,7 @@ module kv260_atrover_mini(
     }
     // ------------------------------------------------------------
     // Battery enclosure
-    if(!_draft_battery_enclosure) {
+    if(!_draw_battery_enclosure) {
       battery_enclosure();
     }
     battery_enclosure_screws();
@@ -500,25 +531,28 @@ difference() {
         cube([base_width, base_length, z_offset], center=true);
   }
   // ------------------------------------------------------------
-  if(bat_enclosure_test) {
-    z_offset  = (false) ? (500) : (50);
-    at_z_base = (true) ? (90) : (-2*bottom_wall_width);
+  if(bat_enclosure_slide_test || bat_enclosure_slide_test_chk) {
+    z_offset  = (bat_enclosure_slide_test) ? (500) : (50);
+    at_z_base = (bat_enclosure_slide_test_chk) ? (90) : (-2*bottom_wall_width);
+    y_offset = (bat_enclosure_slide_test) ? (500) : (50);
     difference() {
       cube([2*base_width, 2*base_length, 2*max_z], center=true);
-      translate([73,base_length/2-92.5,at_z_base])
-        cube([50, 40, z_offset], center=true);
+      translate([-65,base_length/2-92.5,at_z_base])
+        cube([50, y_offset, z_offset], center=true);
     }
     if(half_model)
       translate([base_width/2+83,-base_length/2-60,-2*bottom_wall_width])
         cube([base_width, base_length, z_offset], center=true);
   }
   // ------------------------------------------------------------
-  if(bat_enclosure_slot_test) {
+  if(bat_enclosure_slot_test_chk || bat_enclosure_slot_test) {
     z_offset = 200;
+    y_offset = (bat_enclosure_slot_test) ? (250) : (34);
+    y_toffset = (bat_enclosure_slot_test) ? (0) : (92.5);
     difference() {
       cube([2*base_width, 2*base_length, 2*max_z], center=true);
-      translate([73,base_length/2-92.5,-2*bottom_wall_width])
-        cube([30, 34, z_offset], center=true);
+      translate([base_width/2-32,base_length/2-y_toffset,-2*bottom_wall_width])
+        cube([38, y_offset, z_offset], center=true);
     }
     if(half_model)
       translate([base_width/2+83,-base_length/2-60,-2*bottom_wall_width])

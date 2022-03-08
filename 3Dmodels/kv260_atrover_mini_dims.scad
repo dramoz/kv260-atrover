@@ -13,4 +13,4 @@ bottom_wall_width = z_dim_adj(5);        // sets min. width for weight support, 
 // Battery dimensions
 battery_length = 152;
 battery_width = 100;
-battery_height = 95;
+battery_height = 94.5;
