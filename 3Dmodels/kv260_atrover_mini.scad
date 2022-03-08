@@ -31,10 +31,10 @@ wheel_offset = 40;
 xy_wall_width = ptr_wall_width;
 // ----------------------------------------------------------------------------------
 // Drawing options
-draw_base = true;
-draw_motors_support = true;
-draw_base_casters = true;
-draw_battery_enclosure = false;
+draw_base = false;
+draw_motors_support = false;
+draw_base_casters = false;
+draw_battery_enclosure = true;
 
 use_3dprint_casters = false;
 
@@ -211,12 +211,12 @@ module kv260_atrover_mini(
         cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
         
       // PWR terminals
-      _bat_terminal_l = 14;
+      _bat_terminal_l = 16;
       _bat_terminal_w = 12;
       _bat_terminal_h = 10;
-      translate([_bat_case_xy_wall_width+10, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
+      translate([_bat_case_xy_wall_width+11, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
         cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
-      translate([_bat_case_xy_wall_width+10, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
+      translate([_bat_case_xy_wall_width+11, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
         cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
     }
   }
@@ -224,13 +224,13 @@ module kv260_atrover_mini(
     for(xy_trans = [
       [-bat_case_l/2-1.8*xy_wall_width                    , base_length/2-bat_case_w-0.3*xy_wall_width, bat_supports_xy_size/2, bat_supports_xy_size/2],
       [bat_case_l/2-bat_supports_xy_size+1.9*xy_wall_width, base_length/2-bat_case_w-0.3*xy_wall_width, -xy_wall_width, bat_supports_xy_size/2],
-      //[-bat_case_l/2-2*xy_wall_width                    , base_length/2-bat_supports_xy_size, bat_supports_xy_size/2, -xy_wall_width],
-      //[bat_case_l/2-bat_supports_xy_size+2*xy_wall_width, base_length/2-bat_supports_xy_size, -xy_wall_width, -xy_wall_width],
+      [-bat_case_l/2-2*xy_wall_width                    , base_length/2-bat_supports_xy_size, bat_supports_xy_size/2, -xy_wall_width],
+      [bat_case_l/2-bat_supports_xy_size+2*xy_wall_width, base_length/2-bat_supports_xy_size, -xy_wall_width, -xy_wall_width],
     ])
     {
       xyz_trans = [xy_trans[0], xy_trans[1], -bat_supports_z_size+xy_wall_width];
       xyz_diff_trans = [xy_trans[2], xy_trans[3], -xy_wall_width];
-      %translate(xyz_trans)
+      translate(xyz_trans)
         difference() {
           cube([bat_supports_xy_size, bat_supports_xy_size, bat_supports_z_size+xy_wall_width]);
           translate(xyz_diff_trans)
@@ -240,10 +240,10 @@ module kv260_atrover_mini(
   }
   module battery_enclosure_screws() {
     screws_xy = [
-      [-bat_case_l/2+(bat_supports_xy_size/2+xy_wall_width)/2, -z_screw_3mm_d],
-      [ bat_case_l/2-(bat_supports_xy_size/2+xy_wall_width)/2, -z_screw_3mm_d],
+      [-bat_case_l/2+(bat_supports_xy_size/2+xy_wall_width)/2, -4],
+      [ bat_case_l/2-(bat_supports_xy_size/2+xy_wall_width)/2, -4],
     ];
-    screw_h = bat_supports_xy_size + 0*xy_wall_width;
+    screw_h = bat_supports_xy_size + 1*xy_wall_width;
     z = base_length/2;
     for(xy = screws_xy) {
       rotate([90, 0, 0])
@@ -256,9 +256,9 @@ module kv260_atrover_mini(
     }
     for(xy = screws_xy) {
       rotate([90, 0, 0])
-        translate([xy[0], xy[1], -10])
+        translate([xy[0], xy[1], -19.3])
           union() {
-            translate([0, 0, 12])
+            translate([0, 0, 13])
               cylinder(h=screw_h, d=z_screw_3mm_d, $fn=50, center=true);
             translate([0, -bat_supports_xy_size/2+z_screw_3mm_nut_d/2+2*tolerance, bat_supports_xy_size/4])
               cube([z_screw_3mm_nut_d, bat_supports_xy_size, z_screw_3mm_nut_h], center=true);
@@ -548,10 +548,10 @@ difference() {
   if(bat_enclosure_slot_test_chk || bat_enclosure_slot_test) {
     z_offset = 200;
     y_offset = (bat_enclosure_slot_test) ? (250) : (34);
-    y_toffset = (bat_enclosure_slot_test) ? (0) : (92.5);
+    y_toffset = (bat_enclosure_slot_test) ? (-2) : (92.5);
     difference() {
       cube([2*base_width, 2*base_length, 2*max_z], center=true);
-      translate([base_width/2-32,base_length/2-y_toffset,-2*bottom_wall_width])
+      translate([base_width/2-30,base_length/2-y_toffset,-2*bottom_wall_width])
         cube([38, y_offset, z_offset], center=true);
     }
     if(half_model)
