@@ -31,10 +31,10 @@ wheel_offset = 40;
 xy_wall_width = ptr_wall_width;
 // ----------------------------------------------------------------------------------
 // Drawing options
-draw_base = false;
-draw_motors_support = false;
-draw_base_casters = false;
-draw_battery_enclosure = true;
+draw_base = true;
+draw_motors_support = true;
+draw_base_casters = true;
+draw_battery_enclosure = false;
 
 use_3dprint_casters = false;
 
@@ -43,7 +43,7 @@ draft_guides = false;
 draft_wheels = false;
 draft_motors = false;
 draft_battery = false;
-draft_kv260_enclosure = false;
+draft_kv260_enclosure = true;
 
 // ---------------------------------------
 perimeters_test = false;
