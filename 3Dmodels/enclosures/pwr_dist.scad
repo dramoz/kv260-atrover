@@ -70,8 +70,8 @@ module pwrdst_enclosure(
   }
 }
 
-difference() {
-  *pwrdst_enclosure(draw_as_close_box=true, draw_other_enclosures=true);
+*difference() {
+  *pwrdst_enclosure(draw_as_close_box=true);
   pwrdst_enclosure(draw_lid=true, draw_container=true);
   *pwrdst_enclosure(draw_lid=false, draw_container=true);
   *translate([pwrdst_l/2, -10, -10])

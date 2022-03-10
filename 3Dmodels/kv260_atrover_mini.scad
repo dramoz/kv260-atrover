@@ -4,12 +4,18 @@
 // (mini version for testing)
 // Units 1:1mm
 //
+// -----------
 // TODO:
+// -----------
 // +Ultrasonic sensor (front->kv260_enclosure)
 // +IR floor sensor   (front_bottom->kv260_enclosure)
 // -> CAM later
 // + DOF (camera mount?)
 // Cable holders/passthrough for dc motors
+//
+// Chasis:
+//   - Top: add M4-nut slots for casters
+//   - Battery: improve mounting -> easy to remove/install battery, maybe lid with screws lateral vs top
 // ----------------------------------------------------------------------------------
 include<./modules/printer_limits.scad>
 // ----------------------------------------------------------------------------------
@@ -31,10 +37,10 @@ wheel_offset = 40;
 xy_wall_width = ptr_wall_width;
 // ----------------------------------------------------------------------------------
 // Drawing options
-draw_base = true;
-draw_motors_support = true;
-draw_base_casters = true;
-draw_battery_enclosure = false;
+draw_base = false;
+draw_motors_support = false;
+draw_base_casters = false;
+draw_battery_enclosure = true;
 
 use_3dprint_casters = false;
 
@@ -43,7 +49,8 @@ draft_guides = false;
 draft_wheels = false;
 draft_motors = false;
 draft_battery = false;
-draft_kv260_enclosure = true;
+draft_kv260_enclosure = false;
+draft_pwr_dist = true;
 
 // ---------------------------------------
 perimeters_test = false;
@@ -71,7 +78,7 @@ _draw_battery_enclosure = (draw_battery_enclosure || bat_enclosure_slide_test_ch
 _half_model = half_model;
 _bat_case_xy_wall_width = (_draw_battery_enclosure) ? (1.0*ptr_4lines) : (1.2*ptr_4lines);
 _bat_case_z_tolerance = (_draw_battery_enclosure) ? (0) : (2);
-_bat_case_z_wall_width = z_dim_adj(3);
+_bat_case_z_wall_width = z_dim_adj(2+z_screw_3mm_nut_h);
 _bat_enclosure_vertical_walls_trim_w = (_draw_battery_enclosure) ? (15) : (16);
 
 _rotate_model = !(draft_guides || draft_wheels || draft_motors || _draw_battery_enclosure || draft_battery || draft_kv260_enclosure);
@@ -139,6 +146,10 @@ rear_left_mark = [
 // --------------------------------------------------
 atrover_passthough_holes = concat(mounting_screws, caster_screws, rear_left_mark);
 
+// ----------------------------------------------------------------------------------
+// PWR dist box
+include<./enclosures/pwr_dist.scad>
+
 // *********************************************************************************************
 // ----------------------------------------------------------------------------------
 module kv260_atrover_mini(
@@ -178,46 +189,65 @@ module kv260_atrover_mini(
   bat_supports_z_size = bat_supports_offset+bottom_wall_width+_bat_case_z_tolerance;
   // --------------------------------------------------
   module battery_enclosure() {
-    translate([-bat_case_l/2, base_length/2-bat_case_w+_bat_case_xy_wall_width, bottom_wall_width-bat_supports_offset-_bat_case_z_tolerance-_bat_case_z_wall_width])
-    difference() {
-      cube([bat_case_l, bat_case_w, bat_case_h+bat_supports_offset+_bat_case_z_wall_width]);
-      translate([_bat_case_xy_wall_width, _bat_case_xy_wall_width, -_bat_case_z_wall_width])
-        cube([battery_length, battery_width, battery_height+bat_supports_offset+2*_bat_case_z_wall_width]);
-      
-      _bat_top_w_offset = bat_case_w/2-1.5*bat_wall_supports_offset;
-      _bat_top_l_offset = bat_case_l/2-1.5*bat_wall_supports_offset;
-      for(xy_trans = [
-        [bat_wall_supports_offset,     bat_wall_supports_offset],
-        [bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
-        [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset,     bat_wall_supports_offset],
-        [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
-      ])
-      {
-        xyz_trans = [xy_trans[0], xy_trans[1], bat_case_h+bat_supports_offset-_bat_case_z_wall_width];
-        translate(xyz_trans)
-          cube([_bat_top_l_offset, _bat_top_w_offset, 3*_bat_case_z_wall_width]);
-      }
-      
-      l_chunk = bat_case_l - 2*_bat_enclosure_vertical_walls_trim_w;
-      translate([_bat_enclosure_vertical_walls_trim_w, -_bat_case_xy_wall_width, -bat_wall_supports_lateral_offset])
-        cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
-      translate([_bat_enclosure_vertical_walls_trim_w, battery_width, -bat_wall_supports_lateral_offset])
-        cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
-      
-      w_chunk = bat_case_w - 2*_bat_enclosure_vertical_walls_trim_w;
-      translate([-_bat_case_xy_wall_width, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
-        cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
-      translate([battery_length, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
-        cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
+    translate([-bat_case_l/2, base_length/2-bat_case_w+_bat_case_xy_wall_width, bottom_wall_width-bat_supports_offset-_bat_case_z_tolerance-_bat_case_z_wall_width]) {
+      difference() {
+        cube([bat_case_l, bat_case_w, bat_case_h+bat_supports_offset+_bat_case_z_wall_width]);
+        translate([_bat_case_xy_wall_width, _bat_case_xy_wall_width, -_bat_case_z_wall_width])
+          cube([battery_length, battery_width, battery_height+bat_supports_offset+2*_bat_case_z_wall_width]);
         
-      // PWR terminals
-      _bat_terminal_l = 16;
-      _bat_terminal_w = 12;
-      _bat_terminal_h = 10;
-      translate([_bat_case_xy_wall_width+11, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
-        cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
-      translate([_bat_case_xy_wall_width+11, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
-        cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
+        _bat_top_w_offset = bat_case_w/2-1.5*bat_wall_supports_offset;
+        _bat_top_l_offset = bat_case_l/2-1.5*bat_wall_supports_offset;
+        for(xy_trans = [
+          [bat_wall_supports_offset,     bat_wall_supports_offset],
+          [bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
+          [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset,     bat_wall_supports_offset],
+          [bat_case_l-_bat_top_l_offset-bat_wall_supports_offset, bat_case_w-_bat_top_w_offset-bat_wall_supports_offset],
+        ])
+        {
+          xyz_trans = [xy_trans[0], xy_trans[1], bat_case_h+bat_supports_offset-_bat_case_z_wall_width];
+          translate(xyz_trans)
+            cube([_bat_top_l_offset, _bat_top_w_offset, 3*_bat_case_z_wall_width]);
+        }
+        
+        l_chunk = bat_case_l - 2*_bat_enclosure_vertical_walls_trim_w;
+        translate([_bat_enclosure_vertical_walls_trim_w, -_bat_case_xy_wall_width, -bat_wall_supports_lateral_offset])
+          cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
+        translate([_bat_enclosure_vertical_walls_trim_w, battery_width, -bat_wall_supports_lateral_offset])
+          cube([l_chunk, 3*_bat_case_xy_wall_width, bat_case_h]);
+        
+        w_chunk = bat_case_w - 2*_bat_enclosure_vertical_walls_trim_w;
+        translate([-_bat_case_xy_wall_width, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
+          cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
+        translate([battery_length, _bat_enclosure_vertical_walls_trim_w, -bat_wall_supports_lateral_offset])
+          cube([3*_bat_case_xy_wall_width, w_chunk, bat_case_h]);
+          
+        // PWR terminals
+        _bat_terminal_l = 16;
+        _bat_terminal_w = 12;
+        _bat_terminal_h = 10+_bat_case_z_wall_width;
+        translate([_bat_case_xy_wall_width+11, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
+          cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
+        translate([_bat_case_xy_wall_width+11, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
+          cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
+          
+        // PWR dist box screws
+        xy_screws=[xy_screw_3mm_d, pwrdst_screws_xy];
+        translate([bat_case_l/2+pwrdst_l-_bat_case_xy_wall_width+pwrdst_wall_width, pwrdst_w+_bat_case_xy_wall_width, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
+          rotate([0, 0, 180])
+            for(xy = xy_screws[1]) {
+              translate([xy[0], xy[1], 0])
+                cylinder(h=3*xy_wall_width, d=xy_screws[0], $fn=50, center=true);
+              
+              translate([xy[0], xy[1], -_bat_case_z_wall_width+z_screw_3mm_nut_h/2-0.01])
+                cube([z_screw_3mm_nut_dd, z_screw_3mm_nut_dd, z_screw_3mm_nut_h], center=true);
+            }
+      }
+      if(!draft_pwr_dist) {
+        color("blue", alpha=0.25)
+        translate([bat_case_l/2+pwrdst_l-_bat_case_xy_wall_width+pwrdst_wall_width, pwrdst_w+_bat_case_xy_wall_width, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
+          rotate([0, 0, 180])
+            pwrdst_enclosure(draw_as_close_box=true);
+      }
     }
   }
   module battery_enclosure_supports() {
@@ -405,6 +435,9 @@ module kv260_atrover_mini(
       if(_draw_battery_enclosure) {
         battery_enclosure();
         
+        if(draft_pwr_dist) {
+          
+        }
         if(draft_battery) {
           %color("blue", alpha=0.1)
           translate([-bat_case_l/2+_bat_case_xy_wall_width, base_length/2-bat_case_w+2*_bat_case_xy_wall_width, bottom_wall_width])
