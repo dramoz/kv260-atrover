@@ -49,15 +49,15 @@ module KV260_enclosure(
         translate([12+kv260_enclosure_wall_width, kv260_enclosure_w, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
           cube([118, 3*kv260_enclosure_wall_width, kv260_enclosure_h+kv260_enclosure_bottom_wall_width]);
         
-        // microSD  
-        translate([24+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
-          cube([14, 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
+        // microSD
+        translate([103, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
+          cube([118-103, 3*kv260_enclosure_wall_width, z_dim_adj(2+2)]);
         // Micro-USB
-        translate([80+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
-          cube([11, 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
+        translate([49, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
+          cube([59-49, 3*kv260_enclosure_wall_width, z_dim_adj(3+2)]);
         // P-mod
-        translate([99+kv260_enclosure_wall_width, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
-          cube([18, 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
+        translate([23, -kv260_enclosure_wall_width, kv260_enclosure_bottom_wall_width+kv260_enclosure_board_bt_clearance])
+          cube([41-23, 3*kv260_enclosure_wall_width, z_dim_adj(5+2)]);
       }
     }
   }
@@ -125,11 +125,11 @@ module KV260_enclosure(
   }
 }
 
-*difference() {
+difference() {
   *KV260_enclosure(draw_as_close_box=true, draw_other_enclosures=true);
   *KV260_enclosure(draw_lid=true, draw_container=false);
-  KV260_enclosure(draw_lid=true, draw_container=true);
-  *KV260_enclosure(draw_lid=false, draw_container=true);
+  *KV260_enclosure(draw_lid=true, draw_container=true);
+  KV260_enclosure(draw_lid=false, draw_container=true);
   *translate([kv260_enclosure_l/2, -10, -10])
     cube(500);
 }

@@ -41,7 +41,7 @@ function xy_wall_width_adj(x) =
 // ----------------------------------------------------------------------------------
 // screws diameters with tolerances
 // https://www.engineersedge.com/hardware/standard_metric_hex_nuts_13728.htm
-xy_tolerance = 0.2;
+xy_tolerance = 0.1;
 z_tolerance = min_layer_height;
 
 // M3
