@@ -10,7 +10,7 @@ kv260_enclosure_w = 120+2;
   
 // z plane
 kv260_enclosure_h = z_dim_adj(36);
-kv260_enclosure_board_bt_clearance = z_dim_adj(7);
+kv260_enclosure_board_bt_clearance = z_dim_adj(6.4);
 kv260_enclosure_lid_h = z_dim_adj(12);
 
 kv260_enclosure_wall_width = ptr_wall_width;

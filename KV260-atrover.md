@@ -15,6 +15,10 @@ The KV260-ATROVER (mini) has the following features
 
 - Stereo Vision
 
+Why CNN, because of the calibration process:
+
+https://youtu.be/sW4CVI51jDY
+
 ## Tools
 
 Xilinx Tools v2021.2
