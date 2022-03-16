@@ -41,19 +41,30 @@ function xy_wall_width_adj(x) =
 // ----------------------------------------------------------------------------------
 // screws diameters with tolerances
 // https://www.engineersedge.com/hardware/standard_metric_hex_nuts_13728.htm
-xy_tolerance = 0.2;
+xy_tolerance = 0.1;
 z_tolerance = min_layer_height;
 
 // M3
-xy_screw_3mm_d = 3 + xy_tolerance;
-z_screw_3mm_d  = z_dim_adj(3+z_tolerance);
+xy_screw_3mm_d      = 3 + xy_tolerance;
+xy_screw_3mm_nut_d  = 5.50+z_tolerance;
+xy_screw_3mm_nut_dd = 6.35+z_tolerance;
+xy_screw_3mm_nut_h  = 2.55+z_tolerance;
+
+z_screw_3mm_d      = z_dim_adj(3+z_tolerance);
 z_screw_3mm_nut_d  = z_dim_adj(5.50+z_tolerance);
 z_screw_3mm_nut_dd = z_dim_adj(6.35+z_tolerance);
 z_screw_3mm_nut_h  = z_dim_adj(2.55+z_tolerance);
 
 // M4
-xy_screw_4mm_d = 4 + xy_tolerance;
-z_screw_4mm_d  = z_dim_adj(4+z_tolerance);
+xy_screw_4mm_d      = 4 + xy_tolerance;
+xy_screw_4mm_nut_d  = 7.00+z_tolerance;
+xy_screw_4mm_nut_dd = 8.08+z_tolerance;
+xy_screw_4mm_nut_h  = 3.20+z_tolerance;
+
+z_screw_4mm_d      = z_dim_adj(4+z_tolerance);
+z_screw_4mm_nut_d  = z_dim_adj(7.00+z_tolerance);
+z_screw_4mm_nut_dd = z_dim_adj(8.08+z_tolerance);
+z_screw_4mm_nut_h  = z_dim_adj(3.20+z_tolerance);
 
 // M5
 xy_screw_5mm_d = 5 + xy_tolerance;

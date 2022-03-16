@@ -14,7 +14,6 @@
 // Cable holders/passthrough for dc motors
 //
 // Chasis:
-//   - Top: add M4-nut slots for casters
 //   - Battery: improve mounting -> easy to remove/install battery, maybe lid with screws lateral vs top
 // ----------------------------------------------------------------------------------
 include<./modules/printer_limits.scad>
@@ -37,9 +36,9 @@ wheel_offset = 40;
 xy_wall_width = ptr_wall_width;
 // ----------------------------------------------------------------------------------
 // Drawing options
-draw_base = false;
-draw_motors_support = false;
-draw_base_casters = false;
+draw_base = true;
+draw_motors_support = true;
+draw_base_casters = true;
 draw_battery_enclosure = true;
 
 use_3dprint_casters = false;
@@ -49,7 +48,7 @@ draft_guides = false;
 draft_wheels = false;
 draft_motors = false;
 draft_battery = false;
-draft_kv260_enclosure = false;
+draft_kv260_enclosure = true;
 draft_pwr_dist = true;
 
 // ---------------------------------------
@@ -225,26 +224,26 @@ module kv260_atrover_mini(
         _bat_terminal_l = 16;
         _bat_terminal_w = 12;
         _bat_terminal_h = 10+_bat_case_z_wall_width;
-        translate([_bat_case_xy_wall_width+11, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
+        translate([bat_case_l-_bat_terminal_l - 11 - _bat_case_xy_wall_width, _bat_case_xy_wall_width+3, battery_height-_bat_terminal_h])
           cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
-        translate([_bat_case_xy_wall_width+11, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
+        translate([bat_case_l-_bat_terminal_l - 11 - _bat_case_xy_wall_width, bat_case_w-_bat_case_xy_wall_width-_bat_terminal_w-3, battery_height-_bat_terminal_h])
           cube([_bat_terminal_l, _bat_terminal_w, 3*_bat_terminal_h]);
           
         // PWR dist box screws
         xy_screws=[xy_screw_3mm_d, pwrdst_screws_xy];
-        translate([bat_case_l/2+pwrdst_l-_bat_case_xy_wall_width+pwrdst_wall_width, pwrdst_w+_bat_case_xy_wall_width, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
+        translate([bat_case_l/2+bat_wall_supports_offset/2, bat_case_w/2+bat_wall_supports_offset/2, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
           rotate([0, 0, 180])
             for(xy = xy_screws[1]) {
               translate([xy[0], xy[1], 0])
                 cylinder(h=3*xy_wall_width, d=xy_screws[0], $fn=50, center=true);
               
               translate([xy[0], xy[1], -_bat_case_z_wall_width+z_screw_3mm_nut_h/2-0.01])
-                cube([z_screw_3mm_nut_dd, z_screw_3mm_nut_dd, z_screw_3mm_nut_h], center=true);
+                cylinder(d=xy_screw_3mm_nut_dd, h=z_screw_3mm_nut_h, $fn=6, center=true);
             }
       }
-      if(!draft_pwr_dist) {
+      if(draft_pwr_dist) {
         color("blue", alpha=0.25)
-        translate([bat_case_l/2+pwrdst_l-_bat_case_xy_wall_width+pwrdst_wall_width, pwrdst_w+_bat_case_xy_wall_width, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
+        translate([bat_case_l/2+bat_wall_supports_offset/2, bat_case_w/2+bat_wall_supports_offset/2, bat_case_h+bat_supports_offset+_bat_case_z_wall_width])
           rotate([0, 0, 180])
             pwrdst_enclosure(draw_as_close_box=true);
       }
@@ -322,7 +321,10 @@ module kv260_atrover_mini(
               }
             }
             else {
-              // Nothing to do here for regular casters
+              for(xy = caster_screws) {
+                translate([xy[0], xy[1], bottom_wall_width-z_screw_4mm_nut_h-z_tolerance])
+                  cylinder(h=2*z_screw_4mm_nut_h, d=xy_screw_4mm_nut_d, $fn=6);
+              }
             }
           }
       }
