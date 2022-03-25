@@ -36,7 +36,7 @@ module enclosure_box(
         difference() {
           translate([xy_wall_width, xy_wall_width, z_wall_width])
             cube([length, width, height+z_wall_width]);
-            if(xy_screws_hide)
+            if(xy_screws_hide && xy_screws_hide[1]>0)
               for(xy = xy_screws[1]) {
                 translate([xy[0], xy[1], xy_screws_hide[1]/2+z_wall_width])
                   cube([xy_screws_hide[0]+2*xy_wall_width, xy_screws_hide[0]+2*xy_wall_width, xy_screws_hide[1]], center=true);
@@ -49,9 +49,11 @@ module enclosure_box(
           }
         }
         if(xy_screws_hide) {
+          h = abs(xy_screws_hide[1])+2*z_wall_width;
+          offset = (xy_screws_hide[1] < 0) ? (h/2 + z_wall_width + xy_screws_hide[1]) : (xy_screws_hide[1]/2+2*z_wall_width);
           for(xy = xy_screws[1]) {
-            translate([xy[0], xy[1], xy_screws_hide[1]/2+2*z_wall_width])
-              cylinder(h=xy_screws_hide[1]+2*z_wall_width, d=xy_screws_hide[0], $fn=50, center=true);
+            translate([xy[0], xy[1], offset])
+              cylinder(h=h, d=xy_screws_hide[0], $fn=50, center=true);
           }
         }
       }

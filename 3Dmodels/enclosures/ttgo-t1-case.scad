@@ -9,10 +9,10 @@ use<../modules/enclosure_box.scad>
 ttgo_wall_width = ptr_wall_width;
 ttgo_bottom_wall_width = z_dim_adj(2+xy_screw_3mm_hd_h);
 
-ttgo_l = 46.2;
-ttgo_w = 34.5;
+ttgo_l = 47;
+ttgo_w = 35;
 ttgo_h = z_dim_adj(10) ;
-ttgo_board_bt_clearence = z_dim_adj(1);
+ttgo_board_bt_clearence = z_dim_adj(0);
 
 // ------------------------------------------
 // Screws
@@ -39,18 +39,20 @@ module ttgo_enclosure(
         xy_wall_width=ttgo_wall_width, z_wall_width=ttgo_bottom_wall_width,
         fitted_lid=fitted_lid, draw_container=true,
         xy_screws=[xy_screw_3mm_d, ttgo_screws_xy],
-        xy_screws_hide=[xy_screw_3mm_hd_d, xy_screw_3mm_hd_h],
+        xy_screws_hide=[xy_screw_3mm_hd_d, -xy_screw_3mm_hd_h],
         tolerance=ptr_tolerance
       );
-      //translate([1+ttgo_wall_width, -ttgo_wall_width, ttgo_bottom_wall_width+ttgo_board_bt_clearence])
-      //  cube([36, 3*ttgo_wall_width, ttgo_h+ttgo_bottom_wall_width]);
+      translate([ttgo_l/2-3+ttgo_wall_width, -ttgo_wall_width, ttgo_bottom_wall_width+ttgo_board_bt_clearence])
+        cube([6, 3*ttgo_wall_width, ttgo_h+ttgo_bottom_wall_width]);
+      
+      translate([-ttgo_wall_width, ttgo_w/2-3+ttgo_wall_width, ttgo_bottom_wall_width+ttgo_board_bt_clearence])
+        cube([3*ttgo_wall_width, 6, ttgo_h+ttgo_bottom_wall_width]);
     }
   }
 }
 
-difference() {
+*difference() {
   *ttgo_enclosure(draw_as_close_box=true);
-  *ttgo_enclosure(draw_lid=true, draw_container=true);
   ttgo_enclosure(draw_container=true);
   *translate([ttgo_enclosure_l/2, -10, -10])
     cube(500);

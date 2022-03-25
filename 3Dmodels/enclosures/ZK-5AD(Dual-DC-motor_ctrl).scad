@@ -67,7 +67,7 @@ module zk5ad_enclosure(
       }
 }
 
-difference() {
+*difference() {
   *zk5ad_enclosure(draw_as_close_box=true);
   *zk5ad_enclosure(draw_lid=true, draw_container=true);
   zk5ad_enclosure(draw_container=true);
