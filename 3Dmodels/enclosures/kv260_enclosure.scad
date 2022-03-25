@@ -125,11 +125,11 @@ module KV260_enclosure(
   }
 }
 
-*difference() {
-  *KV260_enclosure(draw_as_close_box=true, draw_other_enclosures=true);
+difference() {
+  KV260_enclosure(draw_as_close_box=true, draw_other_enclosures=true);
   *KV260_enclosure(draw_lid=true, draw_container=false);
   *KV260_enclosure(draw_lid=true, draw_container=true);
-  KV260_enclosure(draw_lid=false, draw_container=true);
+  *KV260_enclosure(draw_lid=false, draw_container=true);
   *translate([kv260_enclosure_l/2, -10, -10])
     cube(500);
 }
