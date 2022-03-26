@@ -22,6 +22,7 @@ module enclosure_box(
   draw_lid=false,
   draw_container=false,
   xy_screws=false,
+  xy_screws_hide=false,
   tolerance=0.0
 )
 {
@@ -32,13 +33,27 @@ module enclosure_box(
     difference() {
       cube([length+2*xy_wall_width, width+2*xy_wall_width, height+z_wall_width]);
       union() {
-        translate([xy_wall_width, xy_wall_width, z_wall_width])
-          cube([length, width, height+z_wall_width]);
-          
+        difference() {
+          translate([xy_wall_width, xy_wall_width, z_wall_width])
+            cube([length, width, height+z_wall_width]);
+            if(xy_screws_hide && xy_screws_hide[1]>0)
+              for(xy = xy_screws[1]) {
+                translate([xy[0], xy[1], xy_screws_hide[1]/2+z_wall_width])
+                  cube([xy_screws_hide[0]+2*xy_wall_width, xy_screws_hide[0]+2*xy_wall_width, xy_screws_hide[1]], center=true);
+              }
+        }
         if(xy_screws) {
           for(xy = xy_screws[1]) {
             translate([xy[0], xy[1], 0])
-              cylinder(h=3*xy_wall_width, d=xy_screws[0], $fn=50, center=true);
+              cylinder(h=3*z_wall_width, d=xy_screws[0], $fn=50, center=true);
+          }
+        }
+        if(xy_screws_hide) {
+          h = abs(xy_screws_hide[1])+2*z_wall_width;
+          offset = (xy_screws_hide[1] < 0) ? (h/2 + z_wall_width + xy_screws_hide[1]) : (xy_screws_hide[1]/2+2*z_wall_width);
+          for(xy = xy_screws[1]) {
+            translate([xy[0], xy[1], offset])
+              cylinder(h=h, d=xy_screws_hide[0], $fn=50, center=true);
           }
         }
       }

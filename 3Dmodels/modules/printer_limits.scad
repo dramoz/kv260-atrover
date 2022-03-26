@@ -46,9 +46,11 @@ z_tolerance = min_layer_height;
 
 // M3
 xy_screw_3mm_d      = 3 + xy_tolerance;
+xy_screw_3mm_hd_d   = 5.3 + xy_tolerance;
+xy_screw_3mm_hd_h   = z_dim_adj(2.1 + xy_tolerance);
 xy_screw_3mm_nut_d  = 5.50+z_tolerance;
 xy_screw_3mm_nut_dd = 6.35+z_tolerance;
-xy_screw_3mm_nut_h  = 2.55+z_tolerance;
+xy_screw_3mm_nut_h  = z_dim_adj(2.55+z_tolerance);
 
 z_screw_3mm_d      = z_dim_adj(3+z_tolerance);
 z_screw_3mm_nut_d  = z_dim_adj(5.50+z_tolerance);
