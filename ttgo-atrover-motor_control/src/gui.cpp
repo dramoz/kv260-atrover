@@ -105,7 +105,8 @@ void clGUI::draw(void) {
     }
     case ScreenPage::STATUS: {
       tft.setTextFont(4);
-      tft_del_ln(1);
+      tft_del_ln(2);
+      tft.print(' ');
       tft.print(DualDC_MotorCtrl.curr_speed());
       tft.print(" st");
       if(DualDC_MotorCtrl.curr_speed() != DualDC_MotorCtrl.TargetSpeed()) {
@@ -114,11 +115,12 @@ void clGUI::draw(void) {
         tft.print(" st)");
       }
       
-      tft_del_ln(2);
-      tft.print(eDualMotorDirection_Names[ static_cast<size_t>(DualDC_MotorCtrl.curr_dir()) ]);
       tft_del_ln(3);
+      tft.print(' ');
+      tft.print(eDualMotorDirection_Names[ static_cast<size_t>(DualDC_MotorCtrl.curr_dir()) ]);
+      tft_del_ln(4);
       if(DualDC_MotorCtrl.curr_dir() != DualDC_MotorCtrl.TargetDirection()) {
-        tft.print(" ->");
+        tft.print("  ->");
         tft.println(eDualMotorDirection_Names[static_cast<size_t>(DualDC_MotorCtrl.TargetDirection())]);
       }
       
