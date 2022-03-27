@@ -462,6 +462,17 @@ When done, disconnect screen to free serial port
 
 **Stereo camera test**
 
+To run a simple test on the stereo camera:
+
+```bash
+ssh -X ubuntu@kria_ip
+cd ~/dev/kv260-atrover/scripts/
+python camera_test.py
+```
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/camera_test.png?raw=true" alt="camera_test.png" style="zoom:100%;" /> |
+| :----------------------------------------------------------: |
+
 
 
 The scripts are based on [niconielsen32-ComputerVision/StereoVisionDepthEstimation/](https://github.com/niconielsen32/ComputerVision/tree/master/StereoVisionDepthEstimation) modified to use one single stereo camera stream.
