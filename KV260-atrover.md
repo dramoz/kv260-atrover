@@ -475,12 +475,20 @@ python camera_test.py
 
 The triangulation test is based on [niconielsen32-ComputerVision/StereoVisionDepthEstimation/](https://github.com/niconielsen32/ComputerVision/tree/master/StereoVisionDepthEstimation) modified to use one single stereo camera stream.
 
+> The triangulation test is loading the calibration matrices and applying the OpenCV remap on both frames. As can be seen in the pictures, the black regions surrounding the frames are a side effect of remapping the frames. It is also noticeable the difference between both camera module lenses.
+
 ```bash
 ssh -X ubuntu@kria_ip
 ~/dev/kv260-atrover/scripts/triangulation_example/
 python camera_test.py
 python stereoVision.py
 ```
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/triangulation_test.png?raw=true" alt="triangulation_test.png" style="zoom:100%;" /> |
+| :----------------------------------------------------------: |
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/triangulation_test2.png?raw=true" alt="triangulation_test.png" style="zoom:100%;" /> |
+| ------------------------------------------------------------ |
 
 
 
