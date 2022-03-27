@@ -1,39 +1,46 @@
 # KRIA KV260-ATROVER (mini)
 
+*Disclaimer:* The following project was done for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021). Most of the code and 3D models are under [The MIT License | Open Source Initiative](https://opensource.org/licenses/MIT) or  [Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) unless specified to the contrary. A copy of this document and the corresponding project files are located at [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover). As part of the application process I received a [free Kria KV260 AI Starter Kit + Basic Accessory Pack](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications#challengeNav).
+
+⚠ This project uses high DC amperage which can be ☠ -  please use extremely caution.
+
 ## Introduction
 
-Being the optimistic person I am, I wanted to do a full autonomous acreage lawn mower - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). Now, being more realistic, and after experiencing some drawbacks typical of such an endeavor + COVID-19 issues which sadly touch my family at the beginning of this year, here I am happy to present you the KRIA KV260-ATROVER (AuTonomous ROVER) mini version - the first prototype of an autonomous self driving mini-rover based on Xilinx KRIAM SOM (Zynq Ultrascale+)
+Being the optimistic person I am, I wanted to do a full autonomous acreage lawn mower - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). Now, being more realistic, and after experiencing some drawbacks typical of such an endeavor + COVID-19 issues which sadly touch my family at the beginning of this year, here I am happy to present you the KRIA KV260-ATROVER (AuTonomous ROVER) mini version - the first prototype of an autonomous self driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
 
-I work as a RTL Verification Engineer, and has been involved with embedded systems and FPGAs since 1998. I learn about the existence of the Zynq devices since the beginning, but never got the time or the opportunity to work with them. Finally last year I decided to sit down and update my skills. My objectives when joining the challenge were:
+My objectives when joining the challenge were:
 
 - Learn about the Xilinx Zynq Ultrascale+ devices
-- Go into AI (Artificial Intelligence)
+- Go into AI (Artificial Intelligence) and ML (Machine Learning)
 
-### KV260-ATROVER (mini)
+**KV260-ATROVER (mini)**
 
-The KV260-ATROVER (mini) has the following features
+The KV260-ATROVER (mini) has the following features:
 
-- Stereo Vision
+- Full 3D Printed chassis (OpenSCAD) available
+- KRIA KV260 board (master)
+  - AI Object Identification + Depth estimation
+  - OpenCV Stereo Vision for distance estimation (reference)
 
-Why CNN, because of the calibration process:
-
-https://youtu.be/sW4CVI51jDY
-
-## Tools
-
-Xilinx Tools v2021.1
-
-## Creating the Platform
-
-https://github.com/Xilinx/Vitis-Tutorials/tree/2021.2/Vitis_Platform_Creation/Design_Tutorials/01-Edge-KV260
+- TTGO-T1 board (slave)
+  - Dual DC motor control
 
 
+**Motivation**
+
+Stereo Vision, DC motor control, route planning and navigation requires a lot of calibration. In the long term, my final goal is to explore and implement a full autonomous robot with self learning capabilities, where the require effort for initial calibration is minimized.
+
+As an example, you can watch [OpenCV Python](https://www.youtube.com/playlist?list=PLLf0llgjmNiZrt5QocH1zq7ih-GdKMgCY) videos from [Clayton Darwin](https://www.youtube.com/c/ClaytonDarwin) were he does a good explanation of the required process to do triangulation using two cameras and OpenCV. An that is just triangulation, PID motor control, route planning and context awareness by them self are quite complex, doable but limit and constrained - and this is why and where AI/ML (CNN) keeps growing in many fields.
 
 # Hardware
 
+## [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html)
+
+The hardware selected to this project is the Xilinx KRIA KV260 board, which was awarded as free hardware in this challenge. Another good candidate is the [Avnet - Ultra96-V2 Board](https://www.avnet.com/wps/portal/us/products/new-product-introductions/npi/aes-ultra96-v2/) which has similar characteristics.
+
 ## Stereo Camera
 
-For this project I am using the [HBVCAM-1780-2](https://www.hbvcamera.com/dual-lens-usb-cameras/1mp-720p-hd-binocular-camera-module.html) binocular camera. This camera was selected as it already outputs a dual image in a single USB port (stream).
+For this project the [HBVCAM-1780-2](https://www.hbvcamera.com/dual-lens-usb-cameras/1mp-720p-hd-binocular-camera-module.html) binocular camera was selected as it already outputs a dual stereo image synchronized in a single USB port (stream), and it has a decent price.
 
 The camera was tested with https://webcamtests.com/ to validate the manufacturer parameters:
 
@@ -43,28 +50,16 @@ The camera was tested with https://webcamtests.com/ to validate the manufacturer
 - Object distance: 30cm ~ $\infty$ (fixed focus - manual adjustable)
 - Dual Image Resolution: `640*240 (30fps), 1280*480 (30fps), 2560*720 (25fps)` (validated)
   - single camera: `320*240 (30fps), 640*480(30fps), 1280*720 (30fps)`
-
 - Connection: micro USB2.0
 - 2x[OV9732](https://www.ovt.com/products/ov09732-h35a/) Sensors
   - Optical format: 1/4"
   - Array size: 1280*720
 
-There is also a Python script `camera_test.py` with the following results:
-
-| Platform           | Resolution                          | Measured fps |
-| ------------------ | ----------------------------------- | ------------ |
-| Ubuntu 20.04 (i7)  | 640x240<br />1280x480<br />2560x720 | ~25pfs       |
-| KRIA KV-260 (PynQ) |                                     |              |
-
-### Camera Calibration
-
-https://github.com/opencv/opencv/blob/4.x/doc/pattern.png
-
-- https://youtu.be/yKypaVl6qQo
-- https://temugeb.github.io/opencv/python/2021/02/02/stereo-camera-calibration-and-triangulation.html
-- https://docs.opencv.org/3.4/dc/dbb/tutorial_py_calibration.html
+As the camera lenses produce some distortion on the capture images, it is necessary to perform a camera calibration as described in [Stereo Vision Camera Calibration in Python with OpenCV](https://youtu.be/yKypaVl6qQo). A modified set of Python scripts used for this project can be found at https://github.com/dramoz/kv260-atrover/tree/main/scripts/camera_calibration_data_gen. The parameters obtained are particular for the module used in this project, and it must be done on a per module basis.
 
 ## DC Motors
+
+
 
 https://electronics.stackexchange.com/questions/242293/is-there-an-ideal-pwm-frequency-for-dc-brush-motors/
 
@@ -73,7 +68,90 @@ https://electronics.stackexchange.com/questions/242293/is-there-an-ideal-pwm-fre
 | <img src="https://ae01.alicdn.com/kf/H3e242e43a0a44acfabd93f7a09ffe272c.jpg" alt="img" style="zoom:50%;" /> |
 | :----------------------------------------------------------: |
 
+DC Motor Driver(s)
 
+
+
+## [LILYGO® TTGO T-Display ESP32](http://www.lilygo.cn/prod_view.aspx?TypeId=50062&Id=1400&FId=t3:50062:3)
+
+For the DC motor control, the future plan is to use the Zynq+ Dual Core ARM  Cortex-R5 processors with FreeRTOS. The initial test was done with a TTGO T-Display (aka TTGO-T1) board. Although I was planning to use the [PMOD](https://digilent.com/reference/pmod/start) to generate the required PWM signals, but after burning two drivers and one TTGO board I decided to leave it to another day.
+
+For this road test, I decide to use the  (aka TTGO T-Display) which can be purchased at [Aliexpress](https://www.aliexpress.com/item/33048962331.html) (Official [LILYGO store](https://lilygo.he.aliexpress.com/store/2090076?spm=a2g0o.detail.1000061.1.59f8142fz8JkSi)). The TTGO-T1 is based on the [ESP32 Espresiff](https://www.espressif.com/en/products/socs/esp32) ([Wikipedia](https://en.wikipedia.org/wiki/ESP32])), a 32bit MCU Tensilica Xtensa LX6 with integrated WiFi, Bluetooth, and a lot of peripherals.
+
+There were some particular reasons I selected this board for the road test:
+
+- Integrated Display + available libraries
+- The SN-GCJA5 requires a dual voltage operation
+  - 5V power supply
+  - 3.3V TTL logic
+- User buttons
+- WiFi ready (which would be used for future apps)
+
+As the TTGO-T1 works with 3.3V TTL and has a USB port that can provide 5Vdc it was a suitable candidate.
+
+## USB WiFi dongle
+
+## Power considerations
+
+Drivers:https://github.com/WCHSoftGroup/ch343ser_linux
+
+```bash
+lusb
+```
+
+> Bus 002 Device 002: ID 0424:5744 Microchip Technology, Inc. (formerly SMSC) Hub
+> Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+> Bus 001 Device 004: ID 0424:2740 Microchip Technology, Inc. (formerly SMSC)
+> Bus 001 Device 003: ID 15aa:1955 Gearway Electronics (Dong Guan) Co., Ltd.
+> **Bus 001 Device 006: ID 1a86:55d4 QinHeng Electronics**
+> Bus 001 Device 002: ID 0424:2744 Microchip Technology, Inc. (formerly SMSC) Hub
+> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+Install driver
+
+```bash
+mkdir repos
+cd repos
+git clone https://github.com/WCHSoftGroup/ch343ser_linux.git
+cd ch343ser_linux/driver
+make ARCH=arm64
+
+# Testing driver
+sudo insmod ch343.ko
+# -> un-plug / plug USB
+ls /dev/tty*USB*
+/dev/ttyCH343USB0
+```
+
+> **/dev/ttyCH343USB0**
+
+```bash
+screen /dev/ttyCH343USB0 115200
+# press TTGO reset button
+```
+
+> rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+> configsip: 0, SPIWP:0xee
+> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+> mode:DIO, clock div:2
+> load:0x3fff0018,len:4
+> load:0x3fff001c,len:1216
+> ho 0 tail 12 room 4
+> load:0x40078000,len:10944
+> load:0x40080400,len:6360
+> entry 0x400806b4
+> **?TTGO**
+
+```bash
+# -> run some commands
+*f064
+# disconnect screen:
+# -> CTRL+a, y
+Really kill this window [y/n]
+```
+
+> [screen is terminating]
+> ubuntu@kria:~/repos$
 
 # Software/Firmware
 
@@ -84,7 +162,7 @@ The journey through the KRIA KV-260 and Xilinx Development Tools was extensive a
 - This should have been the start point when jumping into something as new as the KRIA KV-260.
   - The KRIA flow is slightly different from other ZYNQ Ultrascale boards like the Ultra96-V2 or Z102
   - There is plenty information about the KRIA, Xilinx Tools, Vitis, Vitis-AI, etc. But the information is hard to grasp, and it feels unorganized. The tutorials lack continuity, e.g. they required different tool versions, different boards, etc.
-  - There is no clear line to follow, actually there are several paths to follow - which get confusing and when you finished something, only at the end you realize that it was not the right tool version - and there is no additional information on how to migrate.
+  - There is no clear line to follow, actually there are several paths to follow - which get confusing and when you finished something, only at the end you realize that it was not the right tool version - and there is no additional information on how to migrate (or probably I did not find it).
 
 ## [PYNQ](https://github.com/Xilinx/Kria-PYNQ) to the rescue
 
@@ -96,13 +174,26 @@ The PYNQ framework on the KRIA KV-260 is pretty simple to use.
   - Easier to install new drivers or tools for development
 - Faster to test and deploy new ideas
   - Python + Jupyter-lab
-  - DPU ready overlay
+  - DPU ready overlay (B4096)
 - Easy to install and error prune
+- Remote access with remote graphics applications (`ssh -X` )
+
+But there are some "*drawbacks*":
+
+- Cannot load multiple overlays
+  - e.g. if you need the DPU but at the same time some video pre-processing you are out of luck, but of course you can develop your own overlays
+- Performance: in theory, as you are running over Python you will suffer from latency and throughput. 
+  - I have not test it, but I will do in the future. Nevertheless, for R&D and testing it is good enough.
 
 ### PYNQ install
 
-> At the moment, PYNQ - KRIA installation is broken [Unable to install PYNQ #9](https://github.com/Xilinx/Kria-PYNQ/issues/9)
-> **It is possible to get PYNQ with Xilinx Dev. working by skipping the initial** `sudo apt update; sudo apt upgrade`
+> At the moment, PYNQ - KRIA installation is *"broken"* [Unable to install PYNQ #9](https://github.com/Xilinx/Kria-PYNQ/issues/9)
+> **It is possible to get PYNQ with Xilinx Dev. working by skipping the initial:**
+>
+>    `sudo apt update; sudo apt upgrade`
+>
+> and do it only at the end!
+>
 > *Currently Canonical and PYNQ are working on a new release that will address this issue.*
 
 To install, just follow the instructions on the official GitHub repository https://github.com/Xilinx/Kria-PYNQ, which can be summarized as:
@@ -113,7 +204,7 @@ To install, just follow the instructions on the official GitHub repository https
 
   - Load the SC card and power up the board
 
-- Logging (GUI or Terminal, GUI experience is nicer)
+- Logging (GUI or Terminal, GUI experience is recommended)
 
   - **username**: ubuntu
 
@@ -126,9 +217,19 @@ To install, just follow the instructions on the official GitHub repository https
     - Appearance: move and resize the toolbar
     - Power.Blank_Screen: Never
 
+> After initial configuration and having a valid IP, I prefer to do most of the configuration using ssh
+>
+> `ssh ubuntu@xxx.xxx.xxx.xxx`
+
 - On a terminal window
 
-  > Skip this step until [Unable to install PYNQ #9](https://github.com/Xilinx/Kria-PYNQ/issues/9) is closed!!!
+  ```bash
+  # Setup git credentials
+  git config --global user.email "yout@email"
+  git config --global user.name "Your Name"
+  ```
+
+  > **Skip next step until new Ubuntu/PYNQ release**
 
   ```bash
   sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y;
@@ -151,6 +252,7 @@ To install, just follow the instructions on the official GitHub repository https
   cd ~
   sudo snap install xlnx-config --classic
   xlnx-config.sysinit
+  # -> [Y] when asked
   ```
 
 - Install PYNQ
@@ -161,20 +263,134 @@ To install, just follow the instructions on the official GitHub repository https
   sudo bash install.sh
   ```
 
-  > `sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y; sudo reboot`
-  >
-  > Issue #9
-
 - Testing PYNQ
 
 ```bash
 # Open in your local desktop webbrowser:
 kria:9090/lab
--> run some examples
-# -> The kria as an address should work if you have bonyour, otherwise you can try with the 
+# !try some examples
+# if the kria:9090/lab is not working, try the IP directly
+# To get the IP type the `ip a` command and look for eth0:...
+ip a
 ```
 
-##  Selecting the model
+> 3: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+>     link/ether 00:0a:35:00:22:01 brd ff:ff:ff:ff:ff:ff
+>     inet **192.168.0.134**/24 brd 192.168.0.255 scope global dynamic noprefixroute eth0
+>        valid_lft 7191sec preferred_lft 7191sec
+>     inet6 fe80::1fe:9c9e:1eaf:a932/64 scope link noprefixroute 
+>        valid_lft forever preferred_lft forever
+
+### Additional Drivers & Ubuntu configuration
+
+**Ubuntu packages**
+
+```bash
+sudo apt install -y dkms net-tools build-essential
+```
+
+**USB WiFi**
+
+```bash
+mkdir repos; cd repos
+git clone https://github.com/morrownr/88x2bu-20210702
+cd 88x2bu-20210702
+sudo ARCH=arm64 ./install-driver.sh
+```
+
+> Do you want to edit the driver options file now? [y/N] **n**
+> Do you want to reboot now? (recommended) [y/N] **n**
+
+```bash
+# TTGO-T1 UART/USB drivers
+cd ~/repos
+git clone https://github.com/WCHSoftGroup/ch343ser_linux.git
+cd ch343ser_linux/driver
+make ARCH=arm64
+sudo make install
+sudo reboot
+```
+
+**WiFi configuration**
+
+The easiest way to configure the WiFi is through GNOME. After login, click on the down icon near the power button ⏻▼ and select your network. This connection will be preserved after shutdown without the need of login.
+
+Alternatively you can set it on the command line. Currently I do not know how to make a connection permanently (aka WiFi connection without login), so the GUI method is recommended.
+
+**Final steps**
+
+```bash
+sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y; sudo reboot
+```
+
+*Optional packages*
+
+```bash
+sudo apt install -y graphviz gtkwave tree meld
+```
+
+*Optional Python Virtualenv Wrapper*
+
+> ⚠ PYNQ has its own `virtualenv` setup, I did not test creating a new one and I do not know if there would be any side effect on doing so
+
+```bash
+cd ~
+pip3 install virtualenv virtualenvwrapper
+```
+
+With your favorite editor append the following lines to `.bashrc`
+
+> \# virtualenv and virtualenvwrapper
+> export WORKON_HOME=\${HOME}/.virtualenvs
+> export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+> export VIRTUALENVWRAPPER_VIRTUALENV=\$HOME/.local/bin/virtualenv
+> source \$HOME/.local/bin/virtualenvwrapper.sh
+
+💡In the [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover) I have provide a set of `.bash` configuration scripts that include some extra setup for Ubuntu command line terminals including the above `virtualenv and virtualwrapper` setup. 
+
+They will transform the command line prompt from
+
+![image-20220326223900003](D:\Virtualbox\shared\dev\kv260-atrover\docs_support\old_bash_prompt.png)
+
+to
+
+![image-20220326224050424](D:\Virtualbox\shared\dev\kv260-atrover\docs_support\new_bash_prompt.png)
+
+You can install them next after cloning the project repository,
+
+## Project files
+
+```bash
+cd ~
+mkdir dev
+cd dev
+git clone https://github.com/dramoz/kv260-atrover
+```
+
+NOTE: you can use [Visual Code remotely with SSH](https://code.visualstudio.com/docs/remote/ssh).
+
+> Click ≶ icon on the bottom left corner and create a new connection.
+
+Finally, create a symbolic link to the repository so it is accessible from jupyter-lab
+
+```bash
+cd $PYNQ_JUPYTER_NOTEBOOKS
+ln -s $HOME/dev/kv260-atrover/ kv260-atrover
+```
+
+```bash
+# Copy new .bashrc configuration (optional)
+cp -fv ~/dev/kv260-atrover/scripts/.bash* ~/
+source ~/.bashrc
+```
+
+
+
+## TTGO-T1 firmware
+
+Programming TTGO
+
+# Selecting the model
 
 Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be used as a starting point. The models are deployed on the FPGA on the DPU IP. As the DPU comes in different flavors, please note that if the model is not available for the current DPU model, extra steps are required with Vitis-AI framework to deploy the solution properly.
 
@@ -194,7 +410,31 @@ The available [Xilinx Vitis AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tre
       - Python, C/C++
       - Caffe tends to outperform Tensorflow and Pytorch (https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo#performance-on-kria-kv260-som)
 
-## Reference
+# Conclusion and Future work
+
+
+
+**Multitask CNN**
+
+
+
+**ROS2**
+
+
+
+**Pending immediate tasks**
+
+Given the time limit I have, some guides are missing from this project as there are less relevant at the moment:
+
+- Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer. A how-to print and assemble guide will be provided later.
+- TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS
+- DC motor characterization: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization.
+
+## References & Links
+
+| Title                           | Remarks                 | URL                                     |
+| ------------------------------- | ----------------------- | --------------------------------------- |
+| KV260-ATRover GitHub repository | This project repository | https://github.com/dramoz/kv260-atrover |
 
 ### Tutorials
 
@@ -202,13 +442,9 @@ The available [Xilinx Vitis AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tre
 | -------------------------------- | ------- | -------------------------------------------------------- |
 | Stereo Vision Camera Calibration |         | https://youtu.be/yKypaVl6qQo                             |
 | Camera Calibration using OpenCV  |         | https://learnopencv.com/camera-calibration-using-opencv/ |
-|                                  |         |                                                          |
-|                                  |         |                                                          |
 
 ### Blogs
 
 | Title        | Remarks                 | URL                                              |
 | ------------ | ----------------------- | ------------------------------------------------ |
 | Learn OpenCV | Stereo Vision Tutorials | https://learnopencv.com/author/kaustubh-sadekar/ |
-|              |                         |                                                  |
-|              |                         |                                                  |
