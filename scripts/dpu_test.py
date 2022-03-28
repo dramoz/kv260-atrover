@@ -23,10 +23,14 @@ class CamResMode(Enum):
 # =============================================================================
 # -------------------------------------------------------------------
 # Load DPU model and related files
-overlay.load_model("models/resnet50/dpu_resnet50.xmodel")
+#overlay.load_model("models/resnet50/dpu_resnet50.xmodel")
+#with open("models/resnet50/words.txt", "r") as f:
+#    softmax_labels = f.readlines()
+
+overlay.load_model("models/resnet50.2/resnet50.xmodel")
 with open("models/resnet50/words.txt", "r") as f:
     softmax_labels = f.readlines()
-    
+
 # =============================================================================
 # -------------------------------------------------------------------
 def draw_text(
@@ -120,10 +124,6 @@ def calculate_softmax(data):
     return result
 
 # -------------------------------------------------------------------
-def predict_label(softmax):
-    return softmax_labels[np.argmax(softmax)-1]
-    
-# -------------------------------------------------------------------
 def run_dpu(frame):
     preprocessed = preprocess_fn(frame)
     image[0,...] = preprocessed.reshape(shapeIn[1:])
@@ -132,7 +132,7 @@ def run_dpu(frame):
     temp = [j.reshape(1, outputSize) for j in output_data]
     softmax = calculate_softmax(temp[0][0])
     
-    return predict_label(softmax)
+    return softmax
     
 # =============================================================================
 # -------------------------------------------------------------------
@@ -188,8 +188,10 @@ if cam.isOpened():
         
         # ---------------------------------------------------------------------------
         # DPU
-        predicted_label = run_dpu(frame)
-        proc_txt.append(predicted_label)
+        softmax = run_dpu(frame)
+        softmax_inx = np.argmax(softmax)-1
+        proc_txt.append(f"softmax_inx: {softmax_inx}")
+        proc_txt.append(f"label: {softmax_labels[softmax_inx]}")
         
         # ---------------------------------------------------------------------------
         text_y_pos += draw_text(img_out, f"[{('| ').join(proc_txt)}]", (text_x_pos, text_y_pos))[1]
