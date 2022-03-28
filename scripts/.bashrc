@@ -121,10 +121,4 @@ source $HOME/.local/bin/virtualenvwrapper.sh
 export PATH=${HOME}/.local/bin:$PATH
 
 # Tools paths
-export PATH="${HOME}/tools/fpga-toolchain/bin:$PATH"
-#export PATH=$PATH:${HOME}/tools/riscv64-unknown-elf-gcc-8.1.0-2019.01.0-x86_64-linux-ubuntu14/bin/
-export PATH=$PATH:${HOME}/tools/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
-export CLASSPATH=".:/usr/local/lib/antlr-4.9.2-complete.jar:$CLASSPATH"
-alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.9.2-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.9.2-complete.jar:$CLASSPATH" org.antlr.v4.gui.TestRig'
-
+export PATH=$PATH:$HOME/.platformio/penv/bin
