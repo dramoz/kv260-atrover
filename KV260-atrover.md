@@ -57,6 +57,8 @@ The camera was tested with https://webcamtests.com/ to validate the manufacturer
 
 As the camera lenses produce some distortion on the capture images, it is necessary to perform a camera calibration as described in [Stereo Vision Camera Calibration in Python with OpenCV](https://youtu.be/yKypaVl6qQo). A modified set of Python scripts used for this project can be found at https://github.com/dramoz/kv260-atrover/tree/main/scripts/camera_calibration_data_gen. The parameters obtained are particular for the module used in this project, and it must be done on a per module basis.
 
+The scripts are based on [niconielsen32-ComputerVision/stereoVisionCalibration](https://github.com/niconielsen32/ComputerVision/tree/master/stereoVisionCalibration) modified to use one single stereo camera stream plus some personal modifications.
+
 ## DC Motors
 
 
@@ -74,84 +76,21 @@ DC Motor Driver(s)
 
 ## [LILYGO® TTGO T-Display ESP32](http://www.lilygo.cn/prod_view.aspx?TypeId=50062&Id=1400&FId=t3:50062:3)
 
-For the DC motor control, the future plan is to use the Zynq+ Dual Core ARM  Cortex-R5 processors with FreeRTOS. The initial test was done with a TTGO T-Display (aka TTGO-T1) board. Although I was planning to use the [PMOD](https://digilent.com/reference/pmod/start) to generate the required PWM signals, but after burning two drivers and one TTGO board I decided to leave it to another day.
+For the DC motor control, the future plan is to use the Zynq+ Dual Core ARM  Cortex-R5 processors with FreeRTOS. The initial test was done with a TTGO T-Display (aka TTGO-T1) board. Although I was planning to use the [PMOD](https://digilent.com/reference/pmod/start) to generate the required PWM signals, but after burning two drivers and one TTGO-T1 board I decided to leave it for another day.
 
-For this road test, I decide to use the  (aka TTGO T-Display) which can be purchased at [Aliexpress](https://www.aliexpress.com/item/33048962331.html) (Official [LILYGO store](https://lilygo.he.aliexpress.com/store/2090076?spm=a2g0o.detail.1000061.1.59f8142fz8JkSi)). The TTGO-T1 is based on the [ESP32 Espresiff](https://www.espressif.com/en/products/socs/esp32) ([Wikipedia](https://en.wikipedia.org/wiki/ESP32])), a 32bit MCU Tensilica Xtensa LX6 with integrated WiFi, Bluetooth, and a lot of peripherals.
-
-There were some particular reasons I selected this board for the road test:
-
-- Integrated Display + available libraries
-- The SN-GCJA5 requires a dual voltage operation
-  - 5V power supply
-  - 3.3V TTL logic
-- User buttons
-- WiFi ready (which would be used for future apps)
-
-As the TTGO-T1 works with 3.3V TTL and has a USB port that can provide 5Vdc it was a suitable candidate.
+You can buy a TTGO-T1 board at [Aliexpress](https://www.aliexpress.com/item/33048962331.html) (Official [LILYGO store](https://lilygo.he.aliexpress.com/store/2090076?spm=a2g0o.detail.1000061.1.59f8142fz8JkSi)). It is based on the [ESP32 Espresiff](https://www.espressif.com/en/products/socs/esp32) ([Wikipedia](https://en.wikipedia.org/wiki/ESP32])), a 32bit MCU Tensilica Xtensa LX6 with integrated WiFi, Bluetooth, and a lot of peripherals. This is the board I usually use for R&D.
 
 ## USB WiFi dongle
 
+To do some telemetry and get some real time feedback when testing the system, a wireless communication with good throughput and low latency was required. As the KV260 lacks a dedicated wireless communication interface, a USB WiFi dongle was selected for this. For a more detailed information on how to install the drivers and setup the device used in this project please refer to [Adding USB-WiFi for the Kria KV260 (Ubuntu 20.04.3)](https://www.hackster.io/dramoz/adding-usb-wifi-for-the-kria-kv260-ubuntu-20-04-3-b5e8ea).
+
 ## Power considerations
 
-Drivers:https://github.com/WCHSoftGroup/ch343ser_linux
 
-```bash
-lusb
-```
 
-> Bus 002 Device 002: ID 0424:5744 Microchip Technology, Inc. (formerly SMSC) Hub
-> Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-> Bus 001 Device 004: ID 0424:2740 Microchip Technology, Inc. (formerly SMSC)
-> Bus 001 Device 003: ID 15aa:1955 Gearway Electronics (Dong Guan) Co., Ltd.
-> **Bus 001 Device 006: ID 1a86:55d4 QinHeng Electronics**
-> Bus 001 Device 002: ID 0424:2744 Microchip Technology, Inc. (formerly SMSC) Hub
-> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+## Other components
 
-Install driver
-
-```bash
-mkdir repos
-cd repos
-git clone https://github.com/WCHSoftGroup/ch343ser_linux.git
-cd ch343ser_linux/driver
-make ARCH=arm64
-
-# Testing driver
-sudo insmod ch343.ko
-# -> un-plug / plug USB
-ls /dev/tty*USB*
-/dev/ttyCH343USB0
-```
-
-> **/dev/ttyCH343USB0**
-
-```bash
-screen /dev/ttyCH343USB0 115200
-# press TTGO reset button
-```
-
-> rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
-> configsip: 0, SPIWP:0xee
-> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
-> mode:DIO, clock div:2
-> load:0x3fff0018,len:4
-> load:0x3fff001c,len:1216
-> ho 0 tail 12 room 4
-> load:0x40078000,len:10944
-> load:0x40080400,len:6360
-> entry 0x400806b4
-> **?TTGO**
-
-```bash
-# -> run some commands
-*f064
-# disconnect screen:
-# -> CTRL+a, y
-Really kill this window [y/n]
-```
-
-> [screen is terminating]
-> ubuntu@kria:~/repos$
+To complete assemble an ATRover mini, some other components are required as
 
 # Software/Firmware
 
@@ -164,6 +103,10 @@ The journey through the KRIA KV-260 and Xilinx Development Tools was extensive a
   - There is plenty information about the KRIA, Xilinx Tools, Vitis, Vitis-AI, etc. But the information is hard to grasp, and it feels unorganized. The tutorials lack continuity, e.g. they required different tool versions, different boards, etc.
   - There is no clear line to follow, actually there are several paths to follow - which get confusing and when you finished something, only at the end you realize that it was not the right tool version - and there is no additional information on how to migrate (or probably I did not find it).
 
+## Required tools
+
+The KV260 ATRover uses a TTGO-T1 board to control the DC motors via USB/Serial port. To program the board, please install [PlatformIO](https://platformio.org/platformio-ide) extension for [Visual Code](https://code.visualstudio.com/).
+
 ## [PYNQ](https://github.com/Xilinx/Kria-PYNQ) to the rescue
 
 > [Kria SOMs x Ubuntu x PYNQ](https://pages.xilinx.com/EN-WB-2022-03-22-KriaPYNQUbuntu_LP-Registration.html): nice introductory webinar
@@ -171,7 +114,8 @@ The journey through the KRIA KV-260 and Xilinx Development Tools was extensive a
 The PYNQ framework on the KRIA KV-260 is pretty simple to use.
 
 - It runs on Ubuntu 20.04.04 LTS
-  - Easier to install new drivers or tools for development
+  - Easier to install new drivers or tools for development (e.g. USB WiFi dongle, USB/UART drivers)
+  - Visual Code SSH + PlatformIO Remote Development
 - Faster to test and deploy new ideas
   - Python + Jupyter-lab
   - DPU ready overlay (B4096)
@@ -185,7 +129,7 @@ But there are some "*drawbacks*":
 - Performance: in theory, as you are running over Python you will suffer from latency and throughput. 
   - I have not test it, but I will do in the future. Nevertheless, for R&D and testing it is good enough.
 
-### PYNQ install
+**PYNQ install**
 
 > At the moment, PYNQ - KRIA installation is *"broken"* [Unable to install PYNQ #9](https://github.com/Xilinx/Kria-PYNQ/issues/9)
 > **It is possible to get PYNQ with Xilinx Dev. working by skipping the initial:**
@@ -281,7 +225,7 @@ ip a
 >     inet6 fe80::1fe:9c9e:1eaf:a932/64 scope link noprefixroute 
 >        valid_lft forever preferred_lft forever
 
-### Additional Drivers & Ubuntu configuration
+## Additional Drivers & Ubuntu configuration
 
 **Ubuntu packages**
 
@@ -323,13 +267,13 @@ Alternatively you can set it on the command line. Currently I do not know how to
 sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y; sudo reboot
 ```
 
-*Optional packages*
+***Optional packages***
 
 ```bash
 sudo apt install -y graphviz gtkwave tree meld
 ```
 
-*Optional Python Virtualenv Wrapper*
+***Optional Python Virtualenv Wrapper***
 
 > ⚠ PYNQ has its own `virtualenv` setup, I did not test creating a new one and I do not know if there would be any side effect on doing so
 
@@ -350,15 +294,17 @@ With your favorite editor append the following lines to `.bashrc`
 
 They will transform the command line prompt from
 
-![image-20220326223900003](D:\Virtualbox\shared\dev\kv260-atrover\docs_support\old_bash_prompt.png)
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/old_bash_prompt.png?raw=true" alt="old_bash_prompt.png" style="zoom:100%;" /> |
+| ------------------------------------------------------------ |
 
 to
 
-![image-20220326224050424](D:\Virtualbox\shared\dev\kv260-atrover\docs_support\new_bash_prompt.png)
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/new_bash_prompt.png?raw=true" alt="new_bash_prompt.png" style="zoom:100%;" /> |
+| :----------------------------------------------------------- |
 
-You can install them next after cloning the project repository,
+You can install them next after cloning the project repository.
 
-## Project files
+# Project files
 
 ```bash
 cd ~
@@ -371,24 +317,180 @@ NOTE: you can use [Visual Code remotely with SSH](https://code.visualstudio.com/
 
 > Click ≶ icon on the bottom left corner and create a new connection.
 
-Finally, create a symbolic link to the repository so it is accessible from jupyter-lab
+Create a symbolic link to the repository so it is accessible from jupyter-lab
 
 ```bash
 cd $PYNQ_JUPYTER_NOTEBOOKS
 ln -s $HOME/dev/kv260-atrover/ kv260-atrover
 ```
 
+Copy the `.bashrc` configuration (optional)
+
 ```bash
-# Copy new .bashrc configuration (optional)
 cp -fv ~/dev/kv260-atrover/scripts/.bash* ~/
 source ~/.bashrc
 ```
 
+Finally install the required python dependencies:
+
+```bash
+pip install -r ~/dev/kv260-atrover/scripts/requirements.txt
+```
+
+**TTGO-T1 firmware**
+
+The firmware of the TTGO-T1 board was developed using Visual Code PlatformIO. After installing Visual Code + PlatformIO, clone the project repository on a local machine and add the [ttgo-atrover-motor-control](https://github.com/dramoz/kv260-atrover/tree/main/ttgo-atrover-motor_control) project to PlatformIO. Connect the board to an available USB serial port, compile (✓) and flash (➔) the board by clicking on the icons located at the bottom tool bar in VS code.
+
+It is possible to program the TTGO-T1 board directly from the KRIA KV-260 with [PlatformIO Remote Development](https://docs.platformio.org/en/stable/plus/pio-remote.html) tools.
+
+> A free PlatformIO account is required for remote development.
+
+On your local machine
+
+- Open Visual Studio Code
+
+  ```bash
+  # CTRL+SHIFT+P
+  # Start typing Platf...
+  # -> Click PlatformIO: New Terminal
+  pio account register
+  pio account login
+  ```
+
+On the KV260
+
+- Install
+
+  ```bash
+  python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
+  ```
+
+- Update `.bashrc` (already present if `.bashrc` was updated from the repository)
+
+  ```bash
+  export PATH=$PATH:$HOME/.platformio/penv/bin
+  ```
+
+- Install the [platformio-udev-rules](https://docs.platformio.org/en/stable/faq.html#platformio-udev-rules)
+
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+  sudo service udev restart
+  sudo usermod -a -G dialout $USER
+  sudo usermod -a -G plugdev $USER
+  ```
+
+- Login and start the remote agent
+
+  ```bash
+  pio account login
+  pio remote agent start
+  ```
+
+- > The first call to `pio remote agent start` will require some time while the required packages and dependencies are installed
+
+Local machine remote programming
+
+- On a PlatformIO terminal in VS code
+
+  > Check that the terminal current path is at `~/dev/kv260-atrover/ttgo-atrover-motor_control/`
+
+- Check KV260 remote agent
+
+  ```bash
+  #pio account login (if required)
+  pio remote agent list
+  ```
+
+  > kria
+  > \----
+  > ID: 827c99104301d4120ea475faee3371703eddc89f
+  > Started: 2022-03-27 00:28:45
+
+  ```bash
+  pio remote run -t upload --upload-port /dev/ttyCH343USB0
+  ```
+
+PlatformIO Remote Development is a useful remote programing tool, as if required for example to change the PWM frequency for the DC motors control, we can reprogram the TTGO-T1 without the need of unplugging it from the KV260 board.
+
+# Basic system tests
+
+**TTGO-T1 and DC motors**
+
+```bash
+ssh ubuntu@kria_ip
+screen /dev/ttyCH343USB0 115200
+```
+
+Press the TTGO-T1 reset button, a message similar to this would appear
+
+> rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+> configsip: 0, SPIWP:0xee
+> clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+> mode:DIO, clock div:2
+> load:0x3fff0018,len:4
+> load:0x3fff001c,len:1216
+> ho 0 tail 12 room 4
+> load:0x40078000,len:10944
+> load:0x40080400,len:6360
+> entry 0x400806b4
+> **?TTGO**
+
+Run some commands
+
+- `*m###, m in [f, b, r, l, s]`
+
+  - f: forward
+  - b: backward
+  - r: turn right
+  - l: turn left
+  - s: stop
+  - ###: desired step value, between `min/max_step` range (number string must be 3 numeric characters)
+
+  example: `*f064`
+
+- `!0000`: emergency stop
+
+When done, disconnect screen to free serial port
+
+> `ctrl+a, k`
+>
+> Really kill this window [y/n] `y`
+>
+> [screen is terminating]
+> ubuntu@kria:~/$
+
+**Stereo camera test**
+
+To run a simple test on the stereo camera:
+
+```bash
+ssh -X ubuntu@kria_ip
+cd ~/dev/kv260-atrover/scripts/
+python camera_test.py
+```
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/camera_test.png?raw=true" alt="camera_test.png" style="zoom:100%;" /> |
+| :----------------------------------------------------------: |
+
+The triangulation test is based on [niconielsen32-ComputerVision/StereoVisionDepthEstimation/](https://github.com/niconielsen32/ComputerVision/tree/master/StereoVisionDepthEstimation) modified to use one single stereo camera stream.
+
+> The triangulation test is loading the calibration matrices and applying the OpenCV remap on both frames. As can be seen in the pictures, the black regions surrounding the frames are a side effect of remapping the frames. It is also noticeable the difference between both camera module lenses.
+
+```bash
+ssh -X ubuntu@kria_ip
+~/dev/kv260-atrover/scripts/triangulation_example/
+python camera_test.py
+python stereoVision.py
+```
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/triangulation_test.png?raw=true" alt="triangulation_test.png" style="zoom:100%;" /> |
+| :----------------------------------------------------------: |
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/triangulation_test2.png?raw=true" alt="triangulation_test.png" style="zoom:100%;" /> |
+| ------------------------------------------------------------ |
 
 
-## TTGO-T1 firmware
-
-Programming TTGO
 
 # Selecting the model
 
@@ -412,7 +514,13 @@ The available [Xilinx Vitis AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tre
 
 # Conclusion and Future work
 
+**More sensors**
 
+- Current sensor
+- DOF
+- Ultrasound
+- More cameras
+- cliff sensor
 
 **Multitask CNN**
 
@@ -430,20 +538,20 @@ Given the time limit I have, some guides are missing from this project as there 
 - TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS
 - DC motor characterization: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization.
 
-## References & Links
+# References & Links
 
 | Title                           | Remarks                 | URL                                     |
 | ------------------------------- | ----------------------- | --------------------------------------- |
 | KV260-ATRover GitHub repository | This project repository | https://github.com/dramoz/kv260-atrover |
 
-### Tutorials
+## Tutorials
 
 | Title                            | Remarks | URL                                                      |
 | -------------------------------- | ------- | -------------------------------------------------------- |
 | Stereo Vision Camera Calibration |         | https://youtu.be/yKypaVl6qQo                             |
 | Camera Calibration using OpenCV  |         | https://learnopencv.com/camera-calibration-using-opencv/ |
 
-### Blogs
+## Blogs
 
 | Title        | Remarks                 | URL                                              |
 | ------------ | ----------------------- | ------------------------------------------------ |
