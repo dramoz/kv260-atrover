@@ -36,7 +36,9 @@ As an example, you can watch [OpenCV Python](https://www.youtube.com/playlist?li
 
 ## [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html)
 
-The hardware selected to this project is the Xilinx KRIA KV260 board, which was awarded as free hardware in this challenge. Another good candidate is the [Avnet - Ultra96-V2 Board](https://www.avnet.com/wps/portal/us/products/new-product-introductions/npi/aes-ultra96-v2/) which has similar characteristics.
+The hardware selected to this project is the Xilinx KRIA KV260 board, which was awarded as free hardware in this challenge. Another good candidate is the [Avnet - Ultra96-V2 Board](https://www.avnet.com/wps/portal/us/products/new-product-introductions/npi/aes-ultra96-v2/) which has similar characteristics. One advantage of the KRIA Zynq (XCK26) vs the ZU3EG in the Ultra96-V2 is the [VCU (Video Codec Unit)](https://www.xilinx.com/products/intellectual-property/v-vcu.html) which make it an ideal platform for R&D video applications (livestream)
+
+The KRIA SOM installed in the KV260 Vision AI Starter Kit is a special (non-commercial) SOM, with similar characteristics to the [Kria K26C SOM](https://www.xilinx.com/products/som/kria/k26c-commercial.html). The KV260 has only a single 240-Pin connector and is not certified.
 
 ## Stereo Camera
 
@@ -61,18 +63,25 @@ The scripts are based on [niconielsen32-ComputerVision/stereoVisionCalibration](
 
 ## DC Motors
 
+For the KV260-ATRover the [CHIHAI GM37-550 DC motor](https://www.aliexpress.com/item/4000808942638.html?pdp_ext_f=%7B%22sku_id%22:%2210000008104483462%22,%22ship_from%22:%22%22%7D&gps-id=pcStoreJustForYou&scm=1007.23125.137358.0&scm_id=1007.23125.137358.0&scm-url=1007.23125.137358.0&pvid=49f50fc1-c29b-4a45-91ae-5cb7468be7b7&spm=a2g0o.store_pc_home.smartJustForYou_718209649.0) with ratio 50:1 and 12Vdc with a maximum input power of 40W where selected.
 
-
-https://electronics.stackexchange.com/questions/242293/is-there-an-ideal-pwm-frequency-for-dc-brush-motors/
-
-[MG37-550 DC motor](https://www.aliexpress.com/item/4000808942638.html?pdp_ext_f=%7B%22sku_id%22:%2210000008104483462%22,%22ship_from%22:%22%22%7D&gps-id=pcStoreJustForYou&scm=1007.23125.137358.0&scm_id=1007.23125.137358.0&scm-url=1007.23125.137358.0&pvid=49f50fc1-c29b-4a45-91ae-5cb7468be7b7&spm=a2g0o.store_pc_home.smartJustForYou_718209649.0)
+> The current DC motors are too powerful for the KV260-ATRover mini. They were selected initially for the lawnmower which has a bigger heavier chassis (higher torque requirement) and larger wheels (reducing the speed of the ATRover and therefore increasing the minimum required PWM duty cycle)
 
 | <img src="https://ae01.alicdn.com/kf/H3e242e43a0a44acfabd93f7a09ffe272c.jpg" alt="img" style="zoom:50%;" /> |
 | :----------------------------------------------------------: |
 
-DC Motor Driver(s)
+**DC Motor Driver(s)**
 
+For the motor drivers the [ZK-5AD](https://www.aliexpress.com/item/1005002100401855.html) board was selected. It has two [TA6586](https://www.micros.com.pl/mediaserver/UITA6586_0001.pdf) monolithic IC for driving bi-directional DC motors.
 
+- Working Voltage: DC 3.0V-14V
+- Input Signal Voltage: DC 2.2V-6.0V
+- Drive Current: 5A
+- Stand-by Current: 10uA
+- Working Temperature:-20 to 85 Celsuis
+
+| <img src="https://i0.wp.com/shores.rocks/stem-coding/wp-content/uploads/2021/03/Dual-Motor-Drive-Board-zk-5ad.jpg?fit=666%2C540&ssl=1" alt="ZK-5AD L298N5A Dual DC Motor Drive Module (1 piece) ⋆" style="zoom:80%;" /> | <img src="https://i0.wp.com/shores.rocks/stem-coding/wp-content/uploads/2021/03/zk-5ad-motor-driver-5a-high-power.jpg?fit=948%2C924&ssl=1" alt="ZK-5AD L298N5A Dual DC Motor Drive Module (1 piece)" style="zoom:50%;" /> |
+| :----------------------------------------------------------: | ------------------------------------------------------------ |
 
 ## [LILYGO® TTGO T-Display ESP32](http://www.lilygo.cn/prod_view.aspx?TypeId=50062&Id=1400&FId=t3:50062:3)
 
@@ -90,7 +99,17 @@ To do some telemetry and get some real time feedback when testing the system, a 
 
 ## Other components
 
-To complete assemble an ATRover mini, some other components are required as
+To complete assemble an ATRover mini, some other components are required as:
+
+- M3 screws
+  - chasis
+- Power distribution block
+- Power cables
+  - KRIA power cable
+  - DC motors
+- TTGO-T1 ZK-5AD connector
+- microUSB cable for Stereo Camera
+- USB-C cable for TTGO-T1
 
 # Software/Firmware
 
@@ -105,7 +124,9 @@ The journey through the KRIA KV-260 and Xilinx Development Tools was extensive a
 
 ## Required tools
 
-The KV260 ATRover uses a TTGO-T1 board to control the DC motors via USB/Serial port. To program the board, please install [PlatformIO](https://platformio.org/platformio-ide) extension for [Visual Code](https://code.visualstudio.com/).
+- [Kria-PYNQ](https://github.com/Xilinx/Kria-PYNQ)
+- [Vitis-AI v1.4](https://github.com/Xilinx/Vitis-AI/tree/1.4): the DPU-PYNQ uses version 1.4
+-  [Visual Code](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/platformio-ide): the KV260 ATRover uses a TTGO-T1 board to control the DC motors via USB/Serial port. Please follow the instructions on each website to install the tools.
 
 ## [PYNQ](https://github.com/Xilinx/Kria-PYNQ) to the rescue
 
@@ -225,6 +246,57 @@ ip a
 >     inet6 fe80::1fe:9c9e:1eaf:a932/64 scope link noprefixroute 
 >        valid_lft forever preferred_lft forever
 
+## Vitis-AI (v1.4)
+
+> Vitis-AI requires around 100GB of hard drive space
+
+As the current Vitis-AI version is 2.0, but DPU-PYNQ requires v1.4, please follow the next steps to install the proper tool version. Vitis-AI is installed and run in your local machine (Ubuntu)
+
+**Installation steps**
+
+- [Install docker](https://docs.docker.com/engine/install/)
+
+  ```bash
+  # Prerequisites
+  sudo apt install -y ca-certificates curl gnupg lsb-release
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  
+  # Docker engine
+  sudo apt install -y docker-ce docker-ce-cli containerd.io
+  
+  # Setup group access
+  sudo groupadd docker
+  sudo usermod -aG docker $USER
+  su $USER
+  
+  # Test installation
+  sudo docker run hello-world
+  ```
+
+- Install Vitis-AI
+
+  ```bash
+  mkdir -p ~/repos
+  cd repos
+  git clone --recurse-submodules https://github.com/Xilinx/Vitis-AI
+  cd Vitis-AI
+  git checkout 1.4
+  ```
+
+- Get [Docker image](https://github.com/Xilinx/Vitis-AI/blob/1.4/docs/quick-start/install/install_docker/load_run_docker.md):
+
+  ```bash
+  docker pull xilinx/vitis-ai-cpu:1.4.916
+  ```
+
+  Alternatively, you can build the docker image with:
+
+  ```bash
+  cd setup/docker
+  ./docker_build_cpu.sh
+  ```
+
 ## Additional Drivers & Ubuntu configuration
 
 **Ubuntu packages**
@@ -339,6 +411,33 @@ pip install -r ~/dev/kv260-atrover/scripts/requirements.txt
 
 **TTGO-T1 firmware**
 
+The TTGO-T1 code is a simple four channel PWM generator connected to the ZK-5AD motor driver. It communicates to the KV260 board with a USB/Serial port. The KV260 application send the following commands as requried:
+
+- `*m###, m in [f, b, r, l, s]`
+
+  - f: forward
+  - b: backward
+  - r: turn right
+  - l: turn left
+  - s: stop
+  - ###: desired step value, between `min/max_step` range (number string must be 3 numeric characters)
+
+  example: `*f064`
+
+- `!xxxx`: emergency stop (any four *xxxx* characters)
+
+The following parameters can be configured (required to flash a new firmware into the board):
+
+- `min/max speed`: in steps to control the PWM duty cycle
+- `PWM frequency` and `PWM resolution`
+- acceleration: by means of `speed_step` and update rate (`accel_step_ms`)
+
+The default parameters were set on a trial an error basis as:
+
+- `min_step`: 32, `max_step`: 128
+- [PWM frequency](https://electronics.stackexchange.com/questions/242293/is-there-an-ideal-pwm-frequency-for-dc-brush-motors/): 8Hz
+- `speed_step`: 8, `accel_step_ms`: 200
+
 The firmware of the TTGO-T1 board was developed using Visual Code PlatformIO. After installing Visual Code + PlatformIO, clone the project repository on a local machine and add the [ttgo-atrover-motor-control](https://github.com/dramoz/kv260-atrover/tree/main/ttgo-atrover-motor_control) project to PlatformIO. Connect the board to an available USB serial port, compile (✓) and flash (➔) the board by clicking on the icons located at the bottom tool bar in VS code.
 
 It is possible to program the TTGO-T1 board directly from the KRIA KV-260 with [PlatformIO Remote Development](https://docs.platformio.org/en/stable/plus/pio-remote.html) tools.
@@ -415,6 +514,8 @@ PlatformIO Remote Development is a useful remote programing tool, as if required
 
 # Basic system tests
 
+All the scripts are done in Python using Visual Studio code. Although JupyterLab was nice for the initial R&D, it is faster to run some OpenCV like `imshow()` outside the Jupyter environment, with `ssh -X`.
+
 **TTGO-T1 and DC motors**
 
 ```bash
@@ -438,18 +539,7 @@ Press the TTGO-T1 reset button, a message similar to this would appear
 
 Run some commands
 
-- `*m###, m in [f, b, r, l, s]`
-
-  - f: forward
-  - b: backward
-  - r: turn right
-  - l: turn left
-  - s: stop
-  - ###: desired step value, between `min/max_step` range (number string must be 3 numeric characters)
-
-  example: `*f064`
-
-- `!0000`: emergency stop
+- `*f064`, `*b128`, `*s0000`, `*l128`, `!0000` ...
 
 When done, disconnect screen to free serial port
 
@@ -490,7 +580,11 @@ python stereoVision.py
 | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/triangulation_test2.png?raw=true" alt="triangulation_test.png" style="zoom:100%;" /> |
 | ------------------------------------------------------------ |
 
+>  ☝ At the moment, the triangulation demo is exiting with a `Segmentation fault (core dumped)` error which I did not have time to investigate further at the moment of writing this project.
 
+**Movement Test**
+
+> TODO: basic script going around
 
 # Selecting the model
 
@@ -500,6 +594,28 @@ Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be use
 - The PYNQ has an overlay [DPU-PYNQ](https://github.com/Xilinx/DPU-PYNQ) with a [DPU B4096](https://github.com/Xilinx/DPU-PYNQ/blob/master/boards/KV260/dpu_conf.vh), and uses Vitis-AI 1.4.0
 
 https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo
+
+**[Datasets](https://zbigatron.com/the-top-image-datasets/)**
+
+Imagenet: large set, most popular
+
+COCO: object segmentation
+
+**Topologies**
+
+Resnet
+
+Mobilnet
+
+SSD
+
+Refinedet
+
+Densebox
+
+multi_task
+
+YOLO
 
 Why a pre-trained model? Speed up development. The Vitis-AI version was selected as [Vitis-AI 1.4.0](https://github.com/Xilinx/Kria-PYNQ) as it is the one currently available in PYNQ for Kria.
 
@@ -512,31 +628,112 @@ The available [Xilinx Vitis AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tre
       - Python, C/C++
       - Caffe tends to outperform Tensorflow and Pytorch (https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo#performance-on-kria-kv260-som)
 
-# Conclusion and Future work
+[**Downloading a model**](https://github.com/Xilinx/Vitis-AI/tree/1.4/models/AI-Model-Zoo#automated-download-script)
 
-**More sensors**
+```bash
+cd ~/repos/Vitis-AI/models/AI-Model-Zoo/
+python downloader.py
+```
 
-- Current sensor
-- DOF
-- Ultrasound
-- More cameras
-- cliff sensor
+> input: `cf resnet50`
+>
+> 1:  \['type', 'float & quantized']['board', 'GPU']
+> 2:  \['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
+> 3:  ...
+>
+> input num: `2`
+>
+> 0.00%
+>
+> ...
+>
+> 100.00%
+> done
 
-**Multitask CNN**
+The model will be downloaded as a `tar.gz` file on the same directory where the `downloader` script was invoked.
+
+> ~/repos/Vitis-AI/models/AI-Model-Zoo/$ `ls *.gz`
+>
+> resnet50-zcu102_zcu104_kv260-r1.4.0.tar.gz
+
+## Running Vitis-AI
+
+```bash
+./docker_run.sh xilinx/vitis-ai-cpu:1.4.916
+```
 
 
 
-**ROS2**
+# Final Remarks
 
+This experience was a short/long journey with the KRIA KV-260. Initially I was contemplating getting a Ultra96-V2 as it seemed better on paper for this type of project, but the free hardware option was the KV-260.
 
+In retrospective, my gut feeling was 50/50. On one side, I think the Ultra96-V2 is "better" suited for the ATRover with it smaller form factor, ready WiFi and more I/O ports available out of the box. On the other side, the Kria KV-260 has more USB-Ports, extra camera ports, doubles the DDR-RAM and is capable of video streaming with its integrated VCU (Video Codec Unit) - features which make it ideal for R&D, which at the end is the main idea behind the KV-260 Starter kit.
 
-**Pending immediate tasks**
+As a plus, there is no need to configure any jumpers to select the boot target and the capability of dynamic loading overlays it is key. Finally, in my case, getting Ubuntu out-of-the shelf ready and working without any issues is awesome.
 
-Given the time limit I have, some guides are missing from this project as there are less relevant at the moment:
+Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. But it was worth the journey, I came from almost zero ML/AI knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
 
-- Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer. A how-to print and assemble guide will be provided later.
-- TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS
-- DC motor characterization: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization.
+The final activities to have a proper closure of the first ATRover phase that are not done yet give the timing constraints are:
+
+- BOM: have a more complete bill of materials + a guide on how to assemble the whole project
+- Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer (Ender3 modified to print 2.85mm)
+- TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS: only a short explanation was given in this document.
+- DC motor characterization + improve DC motor control: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization. Also, the current motor setup is generating too much vibration while running at medium speed.
+
+# Future work
+
+- **Proper Overlay Pipeline**
+
+  As mentioned earlier, the available overlays for the Kria-PYNQ does not allow to perform video pre-processing while using a DPU. The next step would be to develop a PYNQ overlay more suitable for the KV260-ATRover setup. The overlay should also include a proper video stream generation using the video codec capabilities of the KRIA SOM.
+
+- **Training Dataset**
+
+  For what I found, most current datasets pictures are up to high, and the world is shown from a complete different perspective than an almost at floor level the ATRover sees (which make you thing how little kids see the world). Now that the ATRover has some limited mobility, it will be possible to gather new training images to improve the CNN training.
+
+- **DC motors downgrade**
+
+  The current DC motors are too powerful for the KV260-ATRover mini. They were selected initially for the lawnmower which has a bigger heavier chassis (higher torque requirement) and larger wheels (reducing the speed of the ATRover and therefore increasing the minimum required PWM duty cycle)
+
+- **More sensors**
+
+  Additional sensors are planned (and required) to improve the ATRover control:
+
+  - 9-DOF: 3-axis accelerometer and 3-axis gyroscope
+
+  - Ultrasound distance measurement
+
+  - Additional cameras for mapping
+
+  - Cliff sensor
+
+- **Chassis upgrade**
+
+  - Lower the camera position or update the lens to wide angle to capture nearer objects
+
+  - Battery compartment for easy battery replacement.
+
+- **Exploring other CNN topologies**
+  - Multitask CNN look like an ideal solution for path control and planning including DC motor control.
+
+- **[ROS2](https://docs.ros.org/en/foxy/index.html)**
+
+  Although ROS2 is available, it is still on the alpha release side
+
+# Future Projects
+
+While learning about the Kria KV-260 a couple of projects came to my mind:
+
+- *Where is my dog?* I am on a rural area and occasionally I let my dog out. As he is a small breed I am always worried about him, and a solution like Alexa "show me cam##" does not satisfices my needs. I already got new IP cameras with RTSP and will begin to do some test early summer.
+- *Monitor my-Kids free-time*. I work from home, which is great, but for a couple of hours while I am working, my kids are supposed to do the homework - which usually does not work as expected. There should be an easier way to monitor and time screen-time.
+
+# Acknowledgments
+
+I want to tank the HacksterIO community for sharing, answering and asking questions. HacksterIO staff for the effort and time into promoting these challenges and activities, I found them a great way to improve my know-how.
+
+Last but not the least, my wife and my kids for supporting and not letting me quit, for understanding my occasional absences (or more often coming late to dinner) and helping with the chores (the ones I was supposed to do)
+
+As always, comments are most welcome.
 
 # References & Links
 
