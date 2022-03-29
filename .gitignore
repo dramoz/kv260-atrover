@@ -372,3 +372,4 @@ dmypy.json
 cython_debug/
 lawtina_mini_old/*
 models/
+notebooks/*
