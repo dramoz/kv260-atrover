@@ -22,11 +22,15 @@ class CamResMode(Enum):
     
 # =============================================================================
 # -------------------------------------------------------------------
-# Load DPU model and related files
+# -> This is a simple test to validate that the # .xmodel downloaded from
+# Vitis-AI matchs the .xmodel of DPU-PYNQ notebook example.
+
+# Load DPU notebook .xmodel and related files
 #overlay.load_model("models/resnet50/dpu_resnet50.xmodel")
 #with open("models/resnet50/words.txt", "r") as f:
 #    softmax_labels = f.readlines()
 
+# Load .xmodel downloaded from Vitis-AI repository
 overlay.load_model("models/resnet50.2/resnet50.xmodel")
 with open("models/resnet50/words.txt", "r") as f:
     softmax_labels = f.readlines()
