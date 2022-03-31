@@ -4,6 +4,8 @@
 
 ⚠ This project uses high DC amperage which can be ☠ -  please use extremely caution.
 
+⚠ All links and references are set to match the tools version used in this project, which most of the time are not the latest. Readers are welcome to go further, as new releases came with significant improvements.
+
 ## Introduction
 
 Being the optimistic person I am, I wanted to do a full autonomous acreage lawn mower - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). Now, being more realistic, and after experiencing some drawbacks typical of such an endeavor + COVID-19 issues which sadly touch my family at the beginning of this year, here I am happy to present you the KRIA KV260-ATROVER (AuTonomous ROVER) mini version - the first prototype of an autonomous self driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
@@ -229,6 +231,7 @@ To install, just follow the instructions on the official GitHub repository https
   ```
 
 - Testing PYNQ
+  - Run the [DPU resnet50](http://kria:9090/lab/workspaces/auto-e/tree/pynq-dpu/dpu_resnet50.ipynb) to validate the DPU-PYNQ installation
 
 ```bash
 # Open in your local desktop webbrowser:
@@ -295,6 +298,12 @@ As the current Vitis-AI version is 2.0, but DPU-PYNQ requires v1.4, please follo
   ```bash
   cd setup/docker
   ./docker_build_cpu.sh
+  ```
+
+- Launch Vitis-AI
+
+  ```bash
+  ./docker_run.sh xilinx/vitis-ai-cpu:1.4.916
   ```
 
 ## Additional Drivers & Ubuntu configuration
@@ -586,83 +595,134 @@ python stereoVision.py
 
 > TODO: basic script going around
 
-# Selecting the model
+# Selecting the model(s)
 
-Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be used as a starting point. The models are deployed on the FPGA on the DPU IP. As the DPU comes in different flavors, please note that if the model is not available for the current DPU model, extra steps are required with Vitis-AI framework to deploy the solution properly.
+Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be used as a starting point. It is referenced as [Vitis-AI AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo). The models are deployed on the FPGA on the DPU IP. As the DPU comes in different flavors, please note that if the model is not available for the current DPU model, extra steps are required with Vitis-AI framework to deploy the solution properly.
 
 - The KRIA KV260 examples run on Petalinux and use a [DPU B3136](https://xilinx.github.io/kria-apps-docs/2020.2/build/html/docs/smartcamera/docs/hw_arch_accel.html), with Xilinx tools 2021.1
 - The PYNQ has an overlay [DPU-PYNQ](https://github.com/Xilinx/DPU-PYNQ) with a [DPU B4096](https://github.com/Xilinx/DPU-PYNQ/blob/master/boards/KV260/dpu_conf.vh), and uses Vitis-AI 1.4.0
 
-https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo
+When selecting the model for this project, one useful metric available at the AI Model Zoo worth mentioning is the [Performance on Kria KV260 SOM](https://github.com/Xilinx/Vitis-AI/tree/v1.4/models/AI-Model-Zoo#performance-on-kria-kv260-som). It summarizes the KV260 latency and throughput of the available model.
 
-**[Datasets](https://zbigatron.com/the-top-image-datasets/)**
+CNNs are available in different topologies, which basically define the application target. Furthermore, each model can be trained using different data sets ([ImageNet](https://www.image-net.org/), [COCO](https://cocodataset.org/), [CityScapes](https://www.cityscapes-dataset.com/), [SYNTHIA](http://synthia-dataset.net/) among others)
 
-Imagenet: large set, most popular
+From the different topologies available in the AI Model Zoo, the following were selected to do some R&D:
 
-COCO: object segmentation
-
-**Topologies**
-
-Resnet
-
-Mobilnet
-
-SSD
-
-Refinedet
-
-Densebox
-
-multi_task
-
-YOLO
-
-Why a pre-trained model? Speed up development. The Vitis-AI version was selected as [Vitis-AI 1.4.0](https://github.com/Xilinx/Kria-PYNQ) as it is the one currently available in PYNQ for Kria.
-
-The available [Xilinx Vitis AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tree/1.4.1/models/AI-Model-Zoo) pre trained models are grouped as:
-
-- Training framework: [comparison](https://wiki.pathmind.com/comparison-frameworks-dl4j-tensorflow-pytorch)
-  - Caffe, Tensorflow/Tensorflow2, Darknet, PyTorch
-    - Darknet: not too many information, it is a very small open source effort
-    - Caffe, Tensorflow, Pytorch
-      - Python, C/C++
-      - Caffe tends to outperform Tensorflow and Pytorch (https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo#performance-on-kria-kv260-som)
+- [YOLO](https://towardsdatascience.com/yolo-you-only-look-once-real-time-object-detection-explained-492dc9230006): (You Only Look Once) object detection and classification
+- [SSD](https://towardsdatascience.com/understanding-ssd-multibox-real-time-object-detection-in-deep-learning-495ef744fab): (Single Shot MultiBox Detector) object detection.
+- [FADnet](https://arxiv.org/abs/2003.10758) ([GitHub repository](https://github.com/HKBU-HPML/FADNet)): disparity estimation
 
 [**Downloading a model**](https://github.com/Xilinx/Vitis-AI/tree/1.4/models/AI-Model-Zoo#automated-download-script)
 
+> Models are downloaded to the local machine where Vitis-AI was installed and later transfer with `spc` to the ATRover.
+
+> To validate the Kria-PYNQ framework running on the KV-260, the resnet50 model was also downloaded. 
+
+To download the models, for each model do:
+
 ```bash
 cd ~/repos/Vitis-AI/models/AI-Model-Zoo/
+
+# -----------------------------------------------------------
+# Caffe resnet50
+# file: resnet50-zcu102_zcu104_kv260-r1.4.0.tar.gz
 python downloader.py
-```
-
 > input: `cf resnet50`
->
-> 1:  \['type', 'float & quantized']['board', 'GPU']
-> 2:  \['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
-> 3:  ...
->
+2: ['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
 > input num: `2`
->
-> 0.00%
->
-> ...
->
-> 100.00%
-> done
+done
+# -----------------------------------------------------------
+# Darknet YOLOV4
+# file: yolov4_leaky_spp_m-zcu102_zcu104_kv260-r1.4.0.tar.gz
+python downloader.py
+> input:dk yolov4
+1 : dk_yolov4_coco_416_416_60.1G_1.4
+> input num:1
+2:  ['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
+> input num:2
+done
+# -----------------------------------------------------------
+# PyTorch FADnet
+# file: FADNet_2_pt-zcu102_zcu104_kv260-r1.4.0.tar.gz
+python downloader.py
+> input:pt fadnet
+4:  ['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
+> input num:4
+done
+# -----------------------------------------------------------
+# TensorFlow SSD
+# file:
+python downloader.py 
+> input:tf ssd
+4 : tf_ssdresnet50v1_fpn_coco_640_640_178.4G_1.4
+> input num:4
+2:  ['type', 'xmodel']['board', 'zcu102 & zcu104 & kv260']
+> input num:2
+done
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Models are downloaded as *tar.gz files
+du -h *.gz
+106M	FADNet_2_pt-zcu102_zcu104_kv260-r1.4.0.tar.gz
+18M	resnet50-zcu102_zcu104_kv260-r1.4.0.tar.gz
+45M	yolov4_leaky_spp_m-zcu102_zcu104_kv260-r1.4.0.tar.gz
 
-The model will be downloaded as a `tar.gz` file on the same directory where the `downloader` script was invoked.
+# transfer them to the KV260 SDcard with
+scp *.gz ubuntu@192.168.0.198:/home/ubuntu/dev/kv260-atrover/scripts/models
 
-> ~/repos/Vitis-AI/models/AI-Model-Zoo/$ `ls *.gz`
->
-> resnet50-zcu102_zcu104_kv260-r1.4.0.tar.gz
-
-## Running Vitis-AI
-
-```bash
-./docker_run.sh xilinx/vitis-ai-cpu:1.4.916
+# Connect to the board and untar the files
+ssh -X ubuntu@kria_ip
+cd ~/dev/kv260-atrover/scripts/models/
+for f in ../*.gz; do tar -xvzf "$f"; done
 ```
 
+>FADNet_2_pt/
+>FADNet_2_pt/FADNet_2_pt.xmodel
+>FADNet_2_pt/md5sum.txt
+>resnet50/
+>resnet50/resnet50.prototxt
+>resnet50/resnet50.xmodel
+>resnet50/md5sum.txt
+>yolov4_leaky_spp_m/
+>yolov4_leaky_spp_m/yolov4_leaky_spp_m.prototxt
+>yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel
+>yolov4_leaky_spp_m/md5sum.txt
 
+The `*.xmodel` files would be the models to load into the DPU.
+
+**Running the scripts**
+
+> Each models requires a pre-process to the input frames and a post-process of the output different in each case. The information can be gather from the Board/GPU models that can be downloaded using the same previous steps (`python downloads.py`) and selecting the board/GPU option
+>
+> `1:  ['type', 'float & quantized']['board', 'GPU']`
+>
+> The downloaded files are `.zip` type.
+>
+> ```bash
+> du -h *.zip
+> 208M	cf_resnet50_imagenet_224_224_7.7G_1.4.zip
+> 529M	dk_yolov4_coco_416_416_60.1G_1.4.zip
+> 1.2G	pt_fadnet_sceneflow_576_960_359G_1.4.zip
+> ```
+>
+> The preprocess information is located in the `readme.md` file in each case.
+>
+> The postprocess depends on each CNN output vector format.
+
+## Deploying YOLOv4
+
+[Yolo 2 Explained](https://towardsdatascience.com/yolo2-walkthrough-with-examples-e40452ca265f#:~:text=Yolo%20Output%20Format&text=Yolo2%20uses%20a%20VGG%2Dstyle,to%20increase%20speed%20or%20accuracy.&text=As%20you%20can%20see%2C%20yolo's,what%20we've%20seen%20before.) ([GitHub](https://github.com/zzxvictor/YOLO_Explained))
+
+[Old Vitis-AI YOLO example](https://github.com/Xilinx/Vitis-AI/blob/v1.1/mpsoc/vitis_ai_dnndk_samples/tf_yolov3_voc_py/tf_yolov3_voc.py)
+
+
+
+## Improving the model(s)
+
+Vitis-AI is the tool required to tailor the neural network model to project particular needs. As realized by running some tests, it would be necessary to re-train the current CNN models.
+
+- A suitable dataset: although there are some indoor datasets, most are at higher levels.
+- Gathering a dataset is time consuming, and resources hungry.
 
 # Final Remarks
 
@@ -672,11 +732,13 @@ In retrospective, my gut feeling was 50/50. On one side, I think the Ultra96-V2 
 
 As a plus, there is no need to configure any jumpers to select the boot target and the capability of dynamic loading overlays it is key. Finally, in my case, getting Ubuntu out-of-the shelf ready and working without any issues is awesome.
 
-Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. But it was worth the journey, I came from almost zero ML/AI knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
+Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. Learning all this and going through the available documentation, examplas was extenuating.
+
+But it was worth the journey, I came from almost zero ML/AI knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
 
 The final activities to have a proper closure of the first ATRover phase that are not done yet give the timing constraints are:
 
-- BOM: have a more complete bill of materials + a guide on how to assemble the whole project
+- BOM: improve the bill of materials with a guide on how to assemble the whole project
 - Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer (Ender3 modified to print 2.85mm)
 - TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS: only a short explanation was given in this document.
 - DC motor characterization + improve DC motor control: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization. Also, the current motor setup is generating too much vibration while running at medium speed.
@@ -720,6 +782,10 @@ The final activities to have a proper closure of the first ATRover phase that ar
 
   Although ROS2 is available, it is still on the alpha release side
 
+- Web Interface
+
+  - Although JupyterLab is nice for some work, a minimalistic webInterface would be nice to have
+
 # Future Projects
 
 While learning about the Kria KV-260 a couple of projects came to my mind:
@@ -741,15 +807,34 @@ As always, comments are most welcome.
 | ------------------------------- | ----------------------- | --------------------------------------- |
 | KV260-ATRover GitHub repository | This project repository | https://github.com/dramoz/kv260-atrover |
 
-## Tutorials
+**Tutorials**
 
 | Title                            | Remarks | URL                                                      |
 | -------------------------------- | ------- | -------------------------------------------------------- |
 | Stereo Vision Camera Calibration |         | https://youtu.be/yKypaVl6qQo                             |
 | Camera Calibration using OpenCV  |         | https://learnopencv.com/camera-calibration-using-opencv/ |
 
-## Blogs
+**Blogs**
 
 | Title        | Remarks                 | URL                                              |
 | ------------ | ----------------------- | ------------------------------------------------ |
 | Learn OpenCV | Stereo Vision Tutorials | https://learnopencv.com/author/kaustubh-sadekar/ |
+
+**Xilinx**
+
+| Title            | Remarks                                                      | URL                                                          |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| VART             | [Vitis-AI Runtime](https://docs.xilinx.com/r/1.4-English/ug1354-xilinx-ai-sdk/Programming-Examples)<br />unified high-level runtime API | https://github.com/Xilinx/Vitis-AI/tree/master/tools/Vitis-AI-Runtime/VART/vart |
+| XIR              | [Xilinx Intermediate Representation](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Compiling-with-an-XIR-based-Toolchain)<br />graph-based intermediate representation of AI algorithms | https://github.com/Xilinx/Vitis-AI/tree/master/tools/Vitis-AI-Runtime/VART/xir |
+| DNNDK            | Deep Neural Network Development Kit User Guide               | https://docs.xilinx.com/v/u/1.6-English/ug1327-dnndk-user-guide |
+| Vitis-AI         | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1414-vitis-ai/Revision-History |
+| Vitis-AI Library | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1354-xilinx-ai-sdk/Revision-History |
+
+**Wiki**
+
+| Title                        | Remarks                                                      | URL                                                          |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| CNN Tensor Shape (aka .dims) | Tensors are in the form NHWC (batchsize, height,width,channels) | https://deeplizard.com/learn/video/k6ZF1TSniYk               |
+| YOLO output                  | YOLO output data post-processing                             | https://towardsdatascience.com/yolo2-walkthrough-with-examples-e40452ca265f |
+| YOLO + OpenCV                | YOLO object detection with OpenCV                            | https://pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/ |
+
