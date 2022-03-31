@@ -1,7 +1,5 @@
-# kv260-atrover
-Kria KV260 Autonomous Rover
-
-
+# Kria KV260-ATRover
+[Adaptive Computing Challenge 2021 report](https://github.com/dramoz/kv260-atrover/blob/main/KV260-atrover.md)
 
 # License(s)
 

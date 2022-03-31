@@ -1,4 +1,9 @@
-# KRIA KV260-ATROVER (mini)
+# Kria KV260-ATROVER (mini)
+
+***A journey through machine learning and Xilinx Kria KV260 Vision AI Starter Kit***
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0001.jpg?raw=true" alt="kv260_atrover_0001.jpg" style="zoom:20%;" /> |
+| :----------------------------------------------------------: |
 
 *Disclaimer:* The following project was done for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021). Most of the code and 3D models are under [The MIT License | Open Source Initiative](https://opensource.org/licenses/MIT) or  [Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) unless specified to the contrary. A copy of this document and the corresponding project files are located at [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover). As part of the application process I received a [free Kria KV260 AI Starter Kit + Basic Accessory Pack](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications#challengeNav).
 
@@ -8,7 +13,14 @@
 
 ## Introduction
 
-Being the optimistic person I am, I wanted to do a full autonomous acreage lawn mower - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). Now, being more realistic, and after experiencing some drawbacks typical of such an endeavor + COVID-19 issues which sadly touch my family at the beginning of this year, here I am happy to present you the KRIA KV260-ATROVER (AuTonomous ROVER) mini version - the first prototype of an autonomous self driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
+The idea of having a self driving vehicle platform has been going around my head for a long time now. First, it started with my personal experience with some robot-vacuums which became a relation of love and not-that-much hate. With the pass of the years, I have enjoyed the benefits of keeping my floors clean (I suffer a lot from dust allergies), but with the past of the years I keep seeing the same problems - which became worst when your family grows and your kids behave like kids.
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0006.jpg?raw=true" alt="kv260_atrover_0006.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0007.jpg?raw=true" alt="kv260_atrover_0007.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0012.jpg?raw=true" alt="kv260_atrover_0012.jpg" style="zoom:20%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+
+And then the we moved to a rural house outside Ottawa, and cutting the grass although relaxing, is time consuming. I started working around a full autonomous acreage lawn mower which I wanted to have an FPGA (just because), when I came across the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) on [HacksterIO](https://www.hackster.io/) - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). But after starting from almost zero knowledge on both Xilinx Zynq Ultrascale+ and AI/ML (Artificial Intelligence/Machine Learning) I run out of time, plus I live in Canada, so a lawnmower was out of the question during winter.
+
+So I decided to step back, and start with a basic ATRover (AuTonomous Rover) and the KRIA KV260-ATRover  mini version was born - the first prototype of an autonomous self driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
 
 My objectives when joining the challenge were:
 
@@ -19,9 +31,9 @@ My objectives when joining the challenge were:
 
 The KV260-ATROVER (mini) has the following features:
 
-- Full 3D Printed chassis (OpenSCAD) available
+- Full 3D Printed chassis with OpenSCAD
 - KRIA KV260 board (master)
-  - AI Object Identification + Depth estimation
+  - AI Object Identification (YOLOv4)
   - OpenCV Stereo Vision for distance estimation (reference)
 
 - TTGO-T1 board (slave)
@@ -593,7 +605,9 @@ python stereoVision.py
 
 **Movement Test**
 
-> TODO: basic script going around
+A simple script to validate the communication between the KV260 board and the TTGO while testing the motors was done.
+
+VIDEO: https://youtu.be/WgYcuWozWEg
 
 # Selecting the model(s)
 
@@ -709,6 +723,12 @@ The `*.xmodel` files would be the models to load into the DPU.
 >
 > The postprocess depends on each CNN output vector format.
 
+## Deploying TF SSD
+
+```bsh
+pip install --upgrade tensorflow
+```
+
 ## Deploying YOLOv4
 
 [Yolo 2 Explained](https://towardsdatascience.com/yolo2-walkthrough-with-examples-e40452ca265f#:~:text=Yolo%20Output%20Format&text=Yolo2%20uses%20a%20VGG%2Dstyle,to%20increase%20speed%20or%20accuracy.&text=As%20you%20can%20see%2C%20yolo's,what%20we've%20seen%20before.) ([GitHub](https://github.com/zzxvictor/YOLO_Explained))
@@ -732,11 +752,11 @@ In retrospective, my gut feeling was 50/50. On one side, I think the Ultra96-V2 
 
 As a plus, there is no need to configure any jumpers to select the boot target and the capability of dynamic loading overlays it is key. Finally, in my case, getting Ubuntu out-of-the shelf ready and working without any issues is awesome.
 
-Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. Learning all this and going through the available documentation, examplas was extenuating.
+Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. Learning all this and going through the available documentation, examples was extenuating. Maybe next time I should spend less time at my 3D printer.
 
-But it was worth the journey, I came from almost zero ML/AI knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
+But it was worth the journey, I came from almost zero AI/ML knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
 
-The final activities to have a proper closure of the first ATRover phase that are not done yet give the timing constraints are:
+The final activities to have a proper closure of the first ATRover phase that are not done yet give the timing left before submitting the project are:
 
 - BOM: improve the bill of materials with a guide on how to assemble the whole project
 - Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer (Ender3 modified to print 2.85mm)
@@ -775,16 +795,23 @@ The final activities to have a proper closure of the first ATRover phase that ar
 
   - Battery compartment for easy battery replacement.
 
-- **Exploring other CNN topologies**
+- **R&D other CNN topologies**
   - Multitask CNN look like an ideal solution for path control and planning including DC motor control.
+  - Single CNN dual camera SSD/YOLO with distance estimation as output
+  - Self-learning/self-calibration CNN for stereovision camera
 
 - **[ROS2](https://docs.ros.org/en/foxy/index.html)**
 
   Although ROS2 is available, it is still on the alpha release side
 
-- Web Interface
+- **Web Interface**
 
   - Although JupyterLab is nice for some work, a minimalistic webInterface would be nice to have
+
+- **From PYNQ to C++**
+
+  - test performance difference between running on Python and C++
+  - almost everything in the Vitis-AI is done in C++, but everything looks prettier on Python
 
 # Future Projects
 
@@ -793,9 +820,11 @@ While learning about the Kria KV-260 a couple of projects came to my mind:
 - *Where is my dog?* I am on a rural area and occasionally I let my dog out. As he is a small breed I am always worried about him, and a solution like Alexa "show me cam##" does not satisfices my needs. I already got new IP cameras with RTSP and will begin to do some test early summer.
 - *Monitor my-Kids free-time*. I work from home, which is great, but for a couple of hours while I am working, my kids are supposed to do the homework - which usually does not work as expected. There should be an easier way to monitor and time screen-time.
 
+Finally, I will try to write some starting tutorials on deploying AI/ML on the Xilinx - MPSoCs, while following the contest forums it was clear that I was not the only one - and I should have asked more questions rather than trying to solve all by myself (but I think that's how I learn more)
+
 # Acknowledgments
 
-I want to tank the HacksterIO community for sharing, answering and asking questions. HacksterIO staff for the effort and time into promoting these challenges and activities, I found them a great way to improve my know-how.
+I want to tank the HacksterIO community for sharing, answering and asking questions. HacksterIO and Xilinx staff for the effort and time into promoting these challenges and activities - and answering questions. I found them a great way to improve my know-how.
 
 Last but not the least, my wife and my kids for supporting and not letting me quit, for understanding my occasional absences (or more often coming late to dinner) and helping with the chores (the ones I was supposed to do)
 
@@ -824,11 +853,13 @@ As always, comments are most welcome.
 
 | Title            | Remarks                                                      | URL                                                          |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| VART             | [Vitis-AI Runtime](https://docs.xilinx.com/r/1.4-English/ug1354-xilinx-ai-sdk/Programming-Examples)<br />unified high-level runtime API | https://github.com/Xilinx/Vitis-AI/tree/master/tools/Vitis-AI-Runtime/VART/vart |
+| VART             | [C++ APIs](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/C-APIs)<br />[Python APIs](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/Python-APIs) | https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/VART-Programming-APIs |
 | XIR              | [Xilinx Intermediate Representation](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Compiling-with-an-XIR-based-Toolchain)<br />graph-based intermediate representation of AI algorithms | https://github.com/Xilinx/Vitis-AI/tree/master/tools/Vitis-AI-Runtime/VART/xir |
 | DNNDK            | Deep Neural Network Development Kit User Guide               | https://docs.xilinx.com/v/u/1.6-English/ug1327-dnndk-user-guide |
 | Vitis-AI         | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1414-vitis-ai/Revision-History |
 | Vitis-AI Library | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1354-xilinx-ai-sdk/Revision-History |
+
+> ⚠ A lot of time was wasted while looking at the wrong Vitis AI User Guide (UG1414) version [v1.4](https://docs.xilinx.com/r/1.4-English/ug1414-vitis-ai/) which was incorrect, the [v1.4.1](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/) does contains the required VART API information required to deploy with Vitis AI-1.4
 
 **Wiki**
 
