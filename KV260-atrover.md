@@ -15,8 +15,8 @@
 
 The idea of having a self driving vehicle platform has been going around my head for a long time now. First, it started with my personal experience with some robot-vacuums which became a relation of love and not-that-much hate. With the pass of the years, I have enjoyed the benefits of keeping my floors clean (I suffer a lot from dust allergies), but with the past of the years I keep seeing the same problems - which became worst when your family grows and your kids behave like kids.
 
-|      |
-| ---- |
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0006.jpg?raw=true" alt="kv260_atrover_0006.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0007.jpg?raw=true" alt="kv260_atrover_0007.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0012.jpg?raw=true" alt="kv260_atrover_0012.jpg" style="zoom:20%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
 And then the we moved to a rural house outside Ottawa, and cutting the grass although relaxing, is time consuming. I started working around a full autonomous acreage lawn mower which I wanted to have an FPGA (just because), when I came across the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) on [HacksterIO](https://www.hackster.io/) - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). But after starting from almost zero knowledge on both Xilinx Zynq Ultrascale+ and AI/ML (Artificial Intelligence/Machine Learning) I run out of time, plus I live in Canada, so a lawnmower was out of the question during winter.
 
