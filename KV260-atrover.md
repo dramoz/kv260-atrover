@@ -2,7 +2,8 @@
 
 ***A journey through machine learning and Xilinx Kria KV260 Vision AI Starter Kit***
 
-<img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0001.jpg?raw=true" alt="kv260_atrover_0001.jpg" style="zoom:10%;" />
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0001.jpg?raw=true" alt="kv260_atrover_0001.jpg" style="zoom:20%;" /> |
+| :----------------------------------------------------------: |
 
 *Disclaimer:* The following project was done for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021). Most of the code and 3D models are under [The MIT License | Open Source Initiative](https://opensource.org/licenses/MIT) or  [Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) unless specified to the contrary. A copy of this document and the corresponding project files are located at [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover). As part of the application process I received a [free Kria KV260 AI Starter Kit + Basic Accessory Pack](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications#challengeNav).
 
