@@ -8,6 +8,7 @@ overlay = DpuOverlay("dpu.bit")
 #pprint(overlay.ip_dict)
 
 # -------------------------------------------------------------------
+import sys
 import cv2
 import numpy as np
 import time
@@ -22,18 +23,9 @@ class CamResMode(Enum):
     
 # =============================================================================
 # -------------------------------------------------------------------
-# -> This is a simple test to validate that the # .xmodel downloaded from
-# Vitis-AI matchs the .xmodel of DPU-PYNQ notebook example.
-
-# Load DPU notebook .xmodel and related files
-#overlay.load_model("models/resnet50/dpu_resnet50.xmodel")
-#with open("models/resnet50/words.txt", "r") as f:
-#    softmax_labels = f.readlines()
-
-# Load .xmodel downloaded from Vitis-AI repository
-overlay.load_model("models/resnet50/resnet50.xmodel")
-with open("models/resnet50/words.txt", "r") as f:
-    softmax_labels = f.readlines()
+# Load DPU model and related files
+overlay.load_model("models/FADNet_2_pt/FADNet_2_pt.xmodel")
+sys.exit(0)
 
 # =============================================================================
 # -------------------------------------------------------------------
@@ -74,19 +66,17 @@ def open_cam(resolution = CamResMode.MEDIUM):
     
 # =============================================================================
 # From Vitis-AI Zoo
-# 1.data preprocess
-#  data channel order: BGR(0~255)                
-#  resize: short side reisze to 256 and keep the aspect ratio.
-#  center crop: 224 * 224                          
-#  mean_value: 104, 107, 123
-#  scale: 1.0
-
+# pt_fadnet_sceneflow_576_960_359G_1.4
+# 1. Data preprocess infomation
+# 
+# - Load image: skimage.io.imread()
+# - Normalize image: torchvision.transforms.Normalize(), mean = (0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)
+# - Resize image: torch.nn.functional.interpolate(), height = 576, width = 960, mode = 'bilinear'
+# 
+# 2. Channel normalization and image warping operations are removed in our modified FADNet for model deployment on FPGA.
 # -------------------------------------------------------------------
-_R_MEAN = 123.
-_G_MEAN = 107.
-_B_MEAN = 104.
-
-MEANS = [_B_MEAN,_G_MEAN,_R_MEAN]
+__imagenet_stats = {'mean': [0.485, 0.456, 0.406],
+                   'std': [0.229, 0.224, 0.225]}
 
 def resize_shortest_edge(image, size):
     H, W = image.shape[:2]
@@ -142,9 +132,7 @@ def run_dpu(frame):
     job_id = dpu.execute_async(input_data, output_data)
     dpu.wait(job_id)
     temp = [j.reshape(1, outputSize) for j in output_data]
-    softmax = calculate_softmax(temp[0][0])
-    
-    return softmax
+    return output_data
     
 # =============================================================================
 # -------------------------------------------------------------------

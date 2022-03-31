@@ -27,11 +27,12 @@ PING_CMD = b'?PING'
 SYNC_CMD = b'^^^^^'
 ACKI_CMD = b'IIIII'
 
+speed = b'092'
 commands = [
-    b'*f064',
-    b'*b064',
-    b'*l064',
-    b'*r064',
+    b'*f'+speed,
+    b'*b'+speed,
+    b'*l'+speed,
+    b'*r'+speed,
     b'*s000',
 ]
 
