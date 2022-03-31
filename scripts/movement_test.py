@@ -27,12 +27,11 @@ PING_CMD = b'?PING'
 SYNC_CMD = b'^^^^^'
 ACKI_CMD = b'IIIII'
 
-speed = b'092'
 commands = [
-    b'*f'+speed,
-    b'*b'+speed,
-    b'*l'+speed,
-    b'*r'+speed,
+    b'*f080',
+    b'*b088',
+    b'*l064',
+    b'*r064',
     b'*s000',
 ]
 
@@ -81,5 +80,7 @@ for cmd in commands:
         # Flush
         while ttgo.read(10):
             pass
+        
+        sleep(4.0)
         
 ttgo.close()
