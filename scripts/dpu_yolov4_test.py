@@ -1,7 +1,8 @@
 # =============================================================================
 # First order of things is to import DPU and load the overlay
-from xml.sax.saxutils import prepare_input_source
 from pynq_dpu import DpuOverlay
+import xir
+import vart
 
 from pprint import pprint
 overlay = DpuOverlay("dpu.bit")
@@ -13,6 +14,11 @@ import numpy as np
 import time
 from enum import Enum
 
+# -------------------------------------------------------------------
+from dpu_yolov4 import *
+from models.coco_labels import get_coco_labels
+
+coco_labels = get_coco_labels()
 # =============================================================================
 # -------------------------------------------------------------------
 class CamResMode(Enum):
@@ -20,28 +26,6 @@ class CamResMode(Enum):
     MEDIUM = (1280, 480) 
     HIGH = (2560, 720)
     
-# =============================================================================
-# Ref. design
-# https://github.com/Xilinx/Vitis-AI/blob/v1.1/mpsoc/vitis_ai_dnndk_samples/tf_yolov3_voc_py/tf_yolov3_voc.py
-# From Vitis-AI Zoo
-# 1. data channel order: BGR(0~255)                
-# 2. resize: 416 * 416(H * W) 
-# 3. mean_value: 0.0, 0.0, 0.0
-# 4. scale: 1 / 255.0
-# 5. reisze mode: biliner
-
-# -------------------------------------------------------------------
-# YOLOv4 data collected from notebook (dpu_test.ipynb)
-# 
-# inputTensor[0]: name=data_fixed, dims=[1, 416, 416, 3], dtype=xint8
-# 
-# outputTensor[0]: name=layer138-conv_fixed, dims=[1, 52, 52, 255], dtype=xint8
-# outputTensor[1]: name=layer149-conv_fixed, dims=[1, 26, 26, 255], dtype=xint8
-# outputTensor[2]: name=layer160-conv_fixed, dims=[1, 13, 13, 255], dtype=xint8
-
-# -------------------------------------------------------------------
-# Load .xmodel downloaded from Vitis-AI repository
-overlay.load_model("models/yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel")
 # =============================================================================
 # -------------------------------------------------------------------
 def draw_text(
@@ -81,61 +65,84 @@ def open_cam(resolution = CamResMode.MEDIUM):
     
 # =============================================================================
 # -------------------------------------------------------------------
-def resize_with_padding(image, size):
-    # resize image with unchanged aspect ratio using padding
-    ih, iw, _ = image.shape
-    w = h = size
-    scale = min(w/iw, h/ih)
-    
-    nw = int(iw*scale)
-    nh = int(ih*scale)
-    
-    image = cv2.resize(image, (nw,nh), interpolation=cv2.INTER_LINEAR)
-    new_image = np.ones((h,w,3), np.uint8) * 128
-    h_start = (h-nh)//2
-    w_start = (w-nw)//2
-    new_image[h_start:h_start+nh, w_start:w_start+nw, :] = image
-    return new_image
+def get_child_subgraph_dpu(graph):
+    assert graph is not None, "'graph' should not be None."
+    root_subgraph = graph.get_root_subgraph()
+    assert (
+        root_subgraph is not None
+    ), "Failed to get root subgraph of input Graph object."
+    if root_subgraph.is_leaf:
+        return []
+    child_subgraphs = root_subgraph.toposort_child_subgraph()
+    assert child_subgraphs is not None and len(child_subgraphs) > 0
+    return [
+        cs
+        for cs in child_subgraphs
+        if cs.has_attr("device") and cs.get_attr("device").upper() == "DPU"
+    ]
 
-# -------------------------------------------------------------------
-def preprocess_img(image, size):
-    image = image[...,::-1]
-    image = resize_with_padding(image, size)
-    
-    image_data = np.array(image, dtype='float32')
-    image_data /= 255.
-    image_data = np.expand_dims(image_data, 0)
-    
-    return image_data
-
-# -------------------------------------------------------------------
-def run_dpu(frame):
-    preprocessed = preprocess_img(frame, 416)
-    image[0,...] = preprocessed.reshape(shapeIn[1:])
-    job_id = dpu.execute_async(input_data, output_data)
-    dpu.wait(job_id)
-    
-    for tensor in output_data:
-        print(f"size: {tensor.size}, shape:{tensor.shape}")
-    
-    return 
-    
 # =============================================================================
 # -------------------------------------------------------------------
-dpu = overlay.runner
-
-inputTensors = dpu.get_input_tensors()
-outputTensors = dpu.get_output_tensors()
-
-shapeIn = tuple(inputTensors[0].dims)
-shapeOut = tuple(outputTensors[0].dims)
-outputSize = int(outputTensors[0].get_data_size() / shapeIn[0])
+def execute_async(dpu, tensor_buffers_dict):
+    input_tensor_buffers = [ tensor_buffers_dict[t.name] for t in dpu.get_input_tensors() ]
+    output_tensor_buffers = [ tensor_buffers_dict[t.name] for t in dpu.get_output_tensors() ]
+    
+    job_id = dpu.execute_async(input_tensor_buffers, output_tensor_buffers)
+    return dpu.wait(job_id)
 
 # -------------------------------------------------------------------
-output_data = [np.empty(shapeOut, dtype=np.float32, order="C")]
-input_data = [np.empty(shapeIn, dtype=np.float32, order="C")]
-image = input_data[0]
+def run_dpu(dpu, frame):
+    # get DPU input/output tensors
+    input_tensor_buffers = dpu.get_inputs()
+    output_tensor_buffers = dpu.get_outputs()
+    output_tensors_dims = dpu.get_output_tensors()
+    
+    input_ndim_1 = tuple(input_tensor_buffers[0].get_tensor().dims)
+    fixpos = input_tensor_buffers[0].get_tensor().get_attr("fix_point")
+    
+    ih, iw, _ = frame.shape
+    img = preprocess_img(frame, (416, 416), fixpos)
+    input_data = np.asarray(input_tensor_buffers[0])
+    input_data[0] = img
+    _ = dpu.execute_async(input_tensor_buffers, output_tensor_buffers)
+    
+    # start post process
+    #conv_out = [ np.reshape(output_tensor_buffers[inx], output_tensors_dims[inx].dims) for inx in range(len(output_tensors_dims)) ]
+    conv_out = [None] * 3
+    conv_out[2] = np.reshape(output_tensor_buffers[2], (1, 13, 13, 3, 85))
+    conv_out[1] = np.reshape(output_tensor_buffers[1], (1, 26, 26, 3, 85))
+    conv_out[0] = np.reshape(output_tensor_buffers[0], (1, 52, 52, 3, 85))
+    """
+    num_classes = len(coco_labels)
+    boxes = []
+    #boxes.append( yolo_box(conv_out[0], 52, num_classes,yolo_anchors[yolo_anchor_masks[2]],0) )
+    #boxes.append( yolo_box(conv_out[1], 26, num_classes,yolo_anchors[yolo_anchor_masks[1]],1) )
+    boxes.append( yolo_box(conv_out[2], 13, num_classes,yolo_anchors[yolo_anchor_masks[0]],2) )
+    outputs = yolo_non_max_suppression(boxes, 0.25, 0.45)
+    boxes, confidence, classes, nums = outputs
+    print(nums)
+    
+    # start annotation
+    if iw>ih:
+        offset = np.array([0, (0.5-ih/(2*iw))])
+        scale = iw
+    else:
+        offset = np.array([(0.5-iw/(2*ih)), 0])
+        scale = ih
+    # use this draw output funciton if image is resized with keeping original aspect ratio
+    #imgdisplay = imgQ_Display.get()
+    img = draw_outputs_scale(frame, scale, offset, outputs, coco_labels)
+    #img = draw_outputs_scale(frame, outputs, class_names)
+    """
+    return frame
 
+# =============================================================================
+# -------------------------------------------------------------------
+xgraph = xir.Graph.deserialize(yolov4_model_path)
+subgraphs = get_child_subgraph_dpu(xgraph)
+assert len(subgraphs) == 1  # only one DPU kernel
+
+dpu = vart.RunnerExt.create_runner(subgraphs[0], "run")
 # =============================================================================
 # ------------------------------------------------------------------------
 frame_width, frame_height, cam = open_cam(resolution=CamResMode.MEDIUM)
@@ -163,18 +170,15 @@ if cam.isOpened():
         # ---------------------------------------------------------------------------
         # Single/Split frames?
         frame, rgt_frame = frame[:, :frame_width//2], frame[:, frame_width//2:]
-        img_out = frame.copy()
         proc_txt.append("lft_frame")
         
         # ---------------------------------------------------------------------------
         # Image transformation
         # ---------------------------------------------------------------------------
-        img_out = resize_with_padding(img_out, 416)
-        
         # ---------------------------------------------------------------------------
         # DPU
-        run_dpu(frame)
-        
+        img_out= run_dpu(dpu, frame)
+        #img_out = frame
         # ---------------------------------------------------------------------------
         
         
@@ -191,8 +195,7 @@ if cam.isOpened():
         
         # ---------------------------------------------------------------------------
         # Draw final
-        cv2.imshow("org", frame)
-        cv2.imshow("resize_padding", img_out)
+        cv2.imshow("org", img_out)
         
         # ---------------------------------------------------------------------------
         # Check exit
