@@ -22,18 +22,7 @@ class CamResMode(Enum):
     
 # =============================================================================
 # -------------------------------------------------------------------
-# -> This is a simple test to validate that the # .xmodel downloaded from
-# Vitis-AI matchs the .xmodel of DPU-PYNQ notebook example.
-
-# Load DPU notebook .xmodel and related files
-#overlay.load_model("models/resnet50/dpu_resnet50.xmodel")
-#with open("models/resnet50/words.txt", "r") as f:
-#    softmax_labels = f.readlines()
-
-# Load .xmodel downloaded from Vitis-AI repository
-overlay.load_model("models/resnet50/resnet50.xmodel")
-with open("models/resnet50/words.txt", "r") as f:
-    softmax_labels = f.readlines()
+overlay.load_model("models/ssd_resnet_50_fpn_coco_tf/ssd_resnet_50_fpn_coco_tf.xmodel")
 
 # =============================================================================
 # -------------------------------------------------------------------
@@ -74,20 +63,26 @@ def open_cam(resolution = CamResMode.MEDIUM):
     
 # =============================================================================
 # From Vitis-AI Zoo
-# 1.data preprocess
-#  data channel order: BGR(0~255)                
-#  resize: short side reisze to 256 and keep the aspect ratio.
-#  center crop: 224 * 224                          
-#  mean_value: 104, 107, 123
-#  scale: 1.0
-
+# 1. Data preprocess
+#   data channel order: RGB(0~255)                
+#   resize: 640 * 640 (tf.image.resize_images(image, tf.stack([new_height, new_width]), method=tf.image.ResizeMethod.BILINEAR, align_corners=False))
+#   channel_means = [123.68, 116.779, 103.939]
+#   input = input - channel_means
+# 
+# 2. Node information
+#   input node: 'image_tensor:0'
+#   output nodes: 'concat:0', 'concat_1:0'
+# 
 # -------------------------------------------------------------------
-_R_MEAN = 123.
-_G_MEAN = 107.
-_B_MEAN = 104.
-
+_R_MEAN = 123.68
+_G_MEAN = 116.779
+_B_MEAN = 103.939
 MEANS = [_B_MEAN,_G_MEAN,_R_MEAN]
 
+# -------------------------------------------------------------------
+def resize(image, size):
+    return cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
+# -------------------------------------------------------------------
 def resize_shortest_edge(image, size):
     H, W = image.shape[:2]
     if H >= W:
@@ -97,7 +92,23 @@ def resize_shortest_edge(image, size):
         nH = size
         nW = int(float(W)/H * size)
     return cv2.resize(image,(nW,nH))
-
+# -------------------------------------------------------------------
+def resize_with_padding(image, size):
+    # resize image with unchanged aspect ratio using padding
+    ih, iw, _ = image.shape
+    w = h = size
+    scale = min(w/iw, h/ih)
+    
+    nw = int(iw*scale)
+    nh = int(ih*scale)
+    
+    image = cv2.resize(image, (nw,nh), interpolation=cv2.INTER_LINEAR)
+    new_image = np.ones((h,w,3), np.uint8) * 128
+    h_start = (h-nh)//2
+    w_start = (w-nw)//2
+    new_image[h_start:h_start+nh, w_start:w_start+nw, :] = image
+    return new_image
+# -------------------------------------------------------------------
 def mean_image_subtraction(image, means):
     B, G, R = cv2.split(image)
     B = B - means[0]
@@ -105,46 +116,29 @@ def mean_image_subtraction(image, means):
     R = R - means[2]
     image = cv2.merge([R, G, B])
     return image
-
+# -------------------------------------------------------------------
 def BGR2RGB(image):
     B, G, R = cv2.split(image)
     image = cv2.merge([R, G, B])
     return image
-
-def central_crop(image, crop_height, crop_width):
-    image_height = image.shape[0]
-    image_width = image.shape[1]
-    offset_height = (image_height - crop_height) // 2
-    offset_width = (image_width - crop_width) // 2
-    return image[offset_height:offset_height + crop_height, offset_width:
-                 offset_width + crop_width, :]
-
-def normalize(image):
-    image=image/256.0
-    image=image-0.5
-    image=image*2
-    return image
-
-def preprocess_fn(image, crop_height = 224, crop_width = 224):
-    image = resize_shortest_edge(image, 256)
-    image = mean_image_subtraction(image, MEANS)
-    image = central_crop(image, crop_height, crop_width)
-    return image
 # -------------------------------------------------------------------
-def calculate_softmax(data):
-    result = np.exp(data)
-    return result
-
+def preprocess_img(image, size=640):
+    image = resize(image, size)
+    image = mean_image_subtraction(image, MEANS)
+    return image
 # -------------------------------------------------------------------
 def run_dpu(frame):
-    preprocessed = preprocess_fn(frame)
-    image[0,...] = preprocessed.reshape(shapeIn[1:])
+    preprocessed = preprocess_img(frame)
+    image[0,...] = preprocessed.reshape(shapeIn[0][1:])
     job_id = dpu.execute_async(input_data, output_data)
     dpu.wait(job_id)
-    temp = [j.reshape(1, outputSize) for j in output_data]
-    softmax = calculate_softmax(temp[0][0])
     
-    return softmax
+    print(f"max: {labels[0][0].argmax()}, size: {labels[0][0].size}, shape:{labels[0][0].shape}")
+    print(f"bbox: {bboxes[0][0]}, size: {bboxes[0][0].size}, shape:{bboxes[0][0].shape}")
+    for tensor in output_data:
+        print(f"size: {tensor.size}, shape:{tensor.shape}")
+        
+    return
     
 # =============================================================================
 # -------------------------------------------------------------------
@@ -153,15 +147,21 @@ dpu = overlay.runner
 inputTensors = dpu.get_input_tensors()
 outputTensors = dpu.get_output_tensors()
 
-shapeIn = tuple(inputTensors[0].dims)
-shapeOut = tuple(outputTensors[0].dims)
-outputSize = int(outputTensors[0].get_data_size() / shapeIn[0])
+# Reserve Input buffers
+shapeIn  = [tuple(tensor.dims) for tensor in inputTensors]
+input_data = [ np.empty(shape, dtype=np.float32, order="C") for shape in shapeIn ]
 
-softmax = np.empty(outputSize)
+# Reserve Output Buffers
+shapeOut = [tuple(tensor.dims) for tensor in outputTensors]
+output_data = [ np.empty(shape, dtype=np.float32, order="C") for shape in shapeOut ]
+
+#outputSize = int(outputTensors[0].get_data_size() / shapeIn[0])
+#softmax = np.empty(outputSize)
 # -------------------------------------------------------------------
-output_data = [np.empty(shapeOut, dtype=np.float32, order="C")]
-input_data = [np.empty(shapeIn, dtype=np.float32, order="C")]
+# Label input/output vectors
 image = input_data[0]
+labels = output_data[0]
+bboxes = output_data[1]
 
 # =============================================================================
 # ------------------------------------------------------------------------
@@ -196,17 +196,12 @@ if cam.isOpened():
         # ---------------------------------------------------------------------------
         # Image transformation
         # ---------------------------------------------------------------------------
-        # ...
+        img_out = resize(img_out, 640)
         
         # ---------------------------------------------------------------------------
         # DPU
-        softmax = run_dpu(frame)
-        softmax_inx = np.argmax(softmax)-1
-        proc_txt.append(f"softmax_inx: {softmax_inx}")
-        proc_txt.append(f"label: {softmax_labels[softmax_inx]}")
+        run_dpu(frame)
         
-        # ---------------------------------------------------------------------------
-        text_y_pos += draw_text(img_out, f"[{('| ').join(proc_txt)}]", (text_x_pos, text_y_pos))[1]
         
         # ---------------------------------------------------------------------------
         # Calculate Frames per second (FPS)
@@ -221,7 +216,8 @@ if cam.isOpened():
         
         # ---------------------------------------------------------------------------
         # Draw final
-        cv2.imshow("Countours", img_out)
+        cv2.imshow("org", frame)
+        cv2.imshow("resize_padding", img_out)
         
         # ---------------------------------------------------------------------------
         # Check exit
