@@ -30,8 +30,8 @@ yolo_anchor_masks = np.array([[6, 7, 8], [3, 4, 5], [0, 1, 2]])
 
 # -------------------------------------------------------------------
 # Load .xmodel downloaded from Vitis-AI repository
-yolov4_model_path = "models/yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel"
-
+#yolov4_model_path = "models/yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel"
+yolov4_model_path = "models/yolov4_leaky_spp_m_pruned_0_36/yolov4_leaky_spp_m_pruned_0_36.xmodel"
 # =============================================================================
 # -------------------------------------------------------------------
 def resize_with_padding(image, size):
@@ -59,10 +59,8 @@ def preprocess_img(image, size, fixpos):
     fix_scale = 2**fixpos
     image_data *= fix_scale/255
     image_data = np.expand_dims(image_data, 0)
-    image_data = np.expand_dims(image_data, 0)
-    image_data = image_data.astype(np.int8)
     return image_data
-
+    
 # -------------------------------------------------------------------
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
