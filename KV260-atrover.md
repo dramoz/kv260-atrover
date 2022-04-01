@@ -5,29 +5,31 @@
 | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0001.jpg?raw=true" alt="kv260_atrover_0001.jpg" style="zoom:20%;" /> |
 | :----------------------------------------------------------: |
 
-*Disclaimer:* The following project was done for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021). Most of the code and 3D models are under [The MIT License | Open Source Initiative](https://opensource.org/licenses/MIT) or  [Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) unless specified to the contrary. A copy of this document and the corresponding project files are located at [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover). As part of the application process I received a [free Kria KV260 AI Starter Kit + Basic Accessory Pack](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications#challengeNav).
+*Disclaimer:* The following project was done for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021). Most of the code and 3D models are under [The MIT License | Open Source Initiative](https://opensource.org/licenses/MIT) or  [Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/) unless specified to the contrary. A copy of this document and the corresponding project files are located at the [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover). As part of the application process, I received a [free Kria KV260 AI Starter Kit + Basic Accessory Pack](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications#challengeNav).
 
-⚠ This project uses high DC amperage which can be ☠ -  please use extremely caution.
+⚠ This project uses high DC amperage which can be ☠ -  please use extreme caution.
 
 ⚠ All links and references are set to match the tools version used in this project, which most of the time are not the latest. Readers are welcome to go further, as new releases came with significant improvements.
 
-## Introduction
+> Vitis-AI v1.4 and v1.4.1 share the same database, and I found that the information available is more complete on v1.4.1
 
-The idea of having a self driving vehicle platform has been going around my head for a long time now. First, it started with my personal experience with some robot-vacuums which became a relation of love and not-that-much hate. With the pass of the years, I have enjoyed the benefits of keeping my floors clean (I suffer a lot from dust allergies), but with the past of the years I keep seeing the same problems - which became worst when your family grows and your kids behave like kids.
+# Introduction
+
+The idea of having a self-driving vehicle platform has been going around my head for a long time now. First, it started with my personal experience with some robot vacuums which became a relation of love and not-that-much hate. With the passing of the years, I have enjoyed the benefits of keeping my floors clean (I suffer a lot from dust allergies), but with the passing of the years, I keep seeing the same problems - which became worst when your family grows and your kids behave like kids.
 
 | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0006.jpg?raw=true" alt="kv260_atrover_0006.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0007.jpg?raw=true" alt="kv260_atrover_0007.jpg" style="zoom:20%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0012.jpg?raw=true" alt="kv260_atrover_0012.jpg" style="zoom:20%;" /> |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
-And then the we moved to a rural house outside Ottawa, and cutting the grass although relaxing, is time consuming. I started working around a full autonomous acreage lawn mower which I wanted to have an FPGA (just because), when I came across the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) on [HacksterIO](https://www.hackster.io/) - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). But after starting from almost zero knowledge on both Xilinx Zynq Ultrascale+ and AI/ML (Artificial Intelligence/Machine Learning) I run out of time, plus I live in Canada, so a lawnmower was out of the question during winter.
+And then the we moved to a rural house outside Ottawa, and cutting the grass although relaxing, is time-consuming. I started working around a full autonomous acreage lawn mower which I wanted to have an FPGA (just because), when I came across the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) on [HacksterIO](https://www.hackster.io/) - and that was my [application for free hardware](https://www.hackster.io/contests/xilinxadaptivecomputing2021/hardware_applications/13951). But after starting from almost zero knowledge on both Xilinx Zynq Ultrascale+ and AI/ML (Artificial Intelligence/Machine Learning) I run out of time, plus I live in Canada, so a lawnmower was out of the question during winter.
 
-So I decided to step back, and start with a basic ATRover (AuTonomous Rover) and the KRIA KV260-ATRover  mini version was born - the first prototype of an autonomous self driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
+So I decided to step back, and start with a basic ATRover (AuTonomous Rover) and the KRIA KV260-ATRover  mini version was born - the prototype of an autonomous self-driving mini-rover based on the [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html) (Zynq Ultrascale+)
 
 My objectives when joining the challenge were:
 
 - Learn about the Xilinx Zynq Ultrascale+ devices
 - Go into AI (Artificial Intelligence) and ML (Machine Learning)
 
-**KV260-ATROVER (mini)**
+## KV260-ATROVER (mini)
 
 The KV260-ATROVER (mini) has the following features:
 
@@ -40,23 +42,31 @@ The KV260-ATROVER (mini) has the following features:
   - Dual DC motor control
 
 
-**Motivation**
+## Motivation
 
-Stereo Vision, DC motor control, route planning and navigation requires a lot of calibration. In the long term, my final goal is to explore and implement a full autonomous robot with self learning capabilities, where the require effort for initial calibration is minimized.
+Stereo Vision, DC motor control, route planning, and navigation require a lot of calibration. In the long term, my final goal is to explore and implement a fully autonomous robot with self-learning capabilities, where the required effort for initial calibration is minimized.
 
-As an example, you can watch [OpenCV Python](https://www.youtube.com/playlist?list=PLLf0llgjmNiZrt5QocH1zq7ih-GdKMgCY) videos from [Clayton Darwin](https://www.youtube.com/c/ClaytonDarwin) were he does a good explanation of the required process to do triangulation using two cameras and OpenCV. An that is just triangulation, PID motor control, route planning and context awareness by them self are quite complex, doable but limit and constrained - and this is why and where AI/ML (CNN) keeps growing in many fields.
+As an example, you can watch [OpenCV Python ](https://www.youtube.com/playlist?list=PLLf0llgjmNiZrt5QocH1zq7ih-GdKMgCY)videos from [Clayton Darwin ](https://www.youtube.com/c/ClaytonDarwin)where he does a good explanation of the required process to do triangulation using two cameras and OpenCV. An that is just triangulation, PID motor control, route planning, and context awareness by themself are quite complex, doable but limited, and space-constrained - and this is why and where AI/ML (CNN) keeps growing in many fields.
 
 # Hardware
 
+The ATRover chassis is a custom-made 3D printed model. The design was done in [OpenSCAD](https://openscad.org/). The chassis is modular, so it is possible to reuse for example the KV260 enclosure for future projects. The weight of the assembled ATRover is around 6Kg.
+
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0001.jpg?raw=true" alt="kv260_atrover_0001.jpg" style="zoom:25%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0002.jpg?raw=true" alt="kv260_atrover_0002.jpg" style="zoom:25%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0003.jpg?raw=true" alt="kv260_atrover_0003.jpg" style="zoom:25%;" /> | <img src="https://github.com/dramoz/kv260-atrover/blob/main/docs_support/kv260_atrover_0004.jpg?raw=true" alt="kv260_atrover_0004.jpg" style="zoom:25%;" /> |
+
+
+
 ## [Kria KV260 Vision AI Starter Kit](https://www.xilinx.com/products/som/kria/kv260-vision-starter-kit.html)
 
-The hardware selected to this project is the Xilinx KRIA KV260 board, which was awarded as free hardware in this challenge. Another good candidate is the [Avnet - Ultra96-V2 Board](https://www.avnet.com/wps/portal/us/products/new-product-introductions/npi/aes-ultra96-v2/) which has similar characteristics. One advantage of the KRIA Zynq (XCK26) vs the ZU3EG in the Ultra96-V2 is the [VCU (Video Codec Unit)](https://www.xilinx.com/products/intellectual-property/v-vcu.html) which make it an ideal platform for R&D video applications (livestream)
+The hardware selected for this project is the Xilinx KRIA KV260 board, which was awarded as free hardware in this challenge. Another good candidate is the [Avnet - Ultra96-V2 Board](https://www.avnet.com/wps/portal/us/products/new-product-introductions/npi/aes-ultra96-v2/) which has similar characteristics. One advantage of the KRIA Zynq (XCK26) vs the ZU3EG in the Ultra96-V2 is the [VCU (Video Codec Unit)](https://www.xilinx.com/products/intellectual-property/v-vcu.html) which makes it an ideal platform for R&D video applications (live stream)
 
 The KRIA SOM installed in the KV260 Vision AI Starter Kit is a special (non-commercial) SOM, with similar characteristics to the [Kria K26C SOM](https://www.xilinx.com/products/som/kria/k26c-commercial.html). The KV260 has only a single 240-Pin connector and is not certified.
 
 ## Stereo Camera
 
-For this project the [HBVCAM-1780-2](https://www.hbvcamera.com/dual-lens-usb-cameras/1mp-720p-hd-binocular-camera-module.html) binocular camera was selected as it already outputs a dual stereo image synchronized in a single USB port (stream), and it has a decent price.
+For this project, the [HBVCAM-1780-2](https://www.hbvcamera.com/dual-lens-usb-cameras/1mp-720p-hd-binocular-camera-module.html) binocular camera was selected as it already outputs a dual stereo image synchronized in a single USB port (stream), and it has a decent price.
 
 The camera was tested with https://webcamtests.com/ to validate the manufacturer parameters:
 
@@ -71,78 +81,90 @@ The camera was tested with https://webcamtests.com/ to validate the manufacturer
   - Optical format: 1/4"
   - Array size: 1280*720
 
-As the camera lenses produce some distortion on the capture images, it is necessary to perform a camera calibration as described in [Stereo Vision Camera Calibration in Python with OpenCV](https://youtu.be/yKypaVl6qQo). A modified set of Python scripts used for this project can be found at https://github.com/dramoz/kv260-atrover/tree/main/scripts/camera_calibration_data_gen. The parameters obtained are particular for the module used in this project, and it must be done on a per module basis.
+| <img src="https://www.hbvcamera.com/data/watermark/20190226/5c7509ce34bf6.jpg" alt="1MP 720P HD  Binocular Camera Module" style="zoom:50%;" /> |
+| :----------------------------------------------------------: |
+
+As the camera lenses produce some distortion on the capture images, it is necessary to perform a camera calibration as described in [Stereo Vision Camera Calibration in Python with OpenCV](https://youtu.be/yKypaVl6qQo). A modified set of Python scripts used for this project can be found at https://github.com/dramoz/kv260-atrover/tree/main/scripts/camera_calibration_data_gen. The parameters obtained are particular for the module used in this project, and it must be done on a per-module basis.
 
 The scripts are based on [niconielsen32-ComputerVision/stereoVisionCalibration](https://github.com/niconielsen32/ComputerVision/tree/master/stereoVisionCalibration) modified to use one single stereo camera stream plus some personal modifications.
 
 ## DC Motors
 
-For the KV260-ATRover the [CHIHAI GM37-550 DC motor](https://www.aliexpress.com/item/4000808942638.html?pdp_ext_f=%7B%22sku_id%22:%2210000008104483462%22,%22ship_from%22:%22%22%7D&gps-id=pcStoreJustForYou&scm=1007.23125.137358.0&scm_id=1007.23125.137358.0&scm-url=1007.23125.137358.0&pvid=49f50fc1-c29b-4a45-91ae-5cb7468be7b7&spm=a2g0o.store_pc_home.smartJustForYou_718209649.0) with ratio 50:1 and 12Vdc with a maximum input power of 40W where selected.
+For the KV260-ATRover the [CHIHAI GM37-550 DC motor ](https://www.aliexpress.com/item/4000808942638.html?pdp_ext_f={"sku_id":"10000008104483462","ship_from":""}&gps-id=pcStoreJustForYou&scm=1007.23125.137358.0&scm_id=1007.23125.137358.0&scm-url=1007.23125.137358.0&pvid=49f50fc1-c29b-4a45-91ae-5cb7468be7b7&spm=a2g0o.store_pc_home.smartJustForYou_718209649.0)with a gear ratio of 50:1 and 12Vdc with a maximum input power of 40W was selected.
 
 > The current DC motors are too powerful for the KV260-ATRover mini. They were selected initially for the lawnmower which has a bigger heavier chassis (higher torque requirement) and larger wheels (reducing the speed of the ATRover and therefore increasing the minimum required PWM duty cycle)
 
 | <img src="https://ae01.alicdn.com/kf/H3e242e43a0a44acfabd93f7a09ffe272c.jpg" alt="img" style="zoom:50%;" /> |
 | :----------------------------------------------------------: |
 
-**DC Motor Driver(s)**
+### DC Motor Driver(s)
 
-For the motor drivers the [ZK-5AD](https://www.aliexpress.com/item/1005002100401855.html) board was selected. It has two [TA6586](https://www.micros.com.pl/mediaserver/UITA6586_0001.pdf) monolithic IC for driving bi-directional DC motors.
+For the motor drivers, the [ZK-5AD](https://www.aliexpress.com/item/1005002100401855.html) board was selected. It has two [TA6586](https://www.micros.com.pl/mediaserver/UITA6586_0001.pdf) monolithic IC for driving bi-directional DC motors.
 
 - Working Voltage: DC 3.0V-14V
 - Input Signal Voltage: DC 2.2V-6.0V
 - Drive Current: 5A
-- Stand-by Current: 10uA
-- Working Temperature:-20 to 85 Celsuis
+- Standby Current: 10uA
+- Working Temperature:-20 to 85 Celsius
 
 | <img src="https://i0.wp.com/shores.rocks/stem-coding/wp-content/uploads/2021/03/Dual-Motor-Drive-Board-zk-5ad.jpg?fit=666%2C540&ssl=1" alt="ZK-5AD L298N5A Dual DC Motor Drive Module (1 piece) ⋆" style="zoom:80%;" /> | <img src="https://i0.wp.com/shores.rocks/stem-coding/wp-content/uploads/2021/03/zk-5ad-motor-driver-5a-high-power.jpg?fit=948%2C924&ssl=1" alt="ZK-5AD L298N5A Dual DC Motor Drive Module (1 piece)" style="zoom:50%;" /> |
 | :----------------------------------------------------------: | ------------------------------------------------------------ |
 
 ## [LILYGO® TTGO T-Display ESP32](http://www.lilygo.cn/prod_view.aspx?TypeId=50062&Id=1400&FId=t3:50062:3)
 
-For the DC motor control, the future plan is to use the Zynq+ Dual Core ARM  Cortex-R5 processors with FreeRTOS. The initial test was done with a TTGO T-Display (aka TTGO-T1) board. Although I was planning to use the [PMOD](https://digilent.com/reference/pmod/start) to generate the required PWM signals, but after burning two drivers and one TTGO-T1 board I decided to leave it for another day.
+For the DC motor control, the plan was to use the Zynq+ Dual-Core ARM  Cortex-R5 processors with FreeRTOS. The initial test was done with a TTGO T-Display (aka TTGO-T1) board. Although I was planning to use the [PMOD](https://digilent.com/reference/pmod/start) to generate the required PWM signals, after burning two drivers and one TTGO-T1 board I decided to leave it for another day.
 
-You can buy a TTGO-T1 board at [Aliexpress](https://www.aliexpress.com/item/33048962331.html) (Official [LILYGO store](https://lilygo.he.aliexpress.com/store/2090076?spm=a2g0o.detail.1000061.1.59f8142fz8JkSi)). It is based on the [ESP32 Espresiff](https://www.espressif.com/en/products/socs/esp32) ([Wikipedia](https://en.wikipedia.org/wiki/ESP32])), a 32bit MCU Tensilica Xtensa LX6 with integrated WiFi, Bluetooth, and a lot of peripherals. This is the board I usually use for R&D.
+You can buy a TTGO-T1 board at [Aliexpress](https://www.aliexpress.com/item/33048962331.html) (the Official [LILYGO store](https://lilygo.he.aliexpress.com/store/2090076?spm=a2g0o.detail.1000061.1.59f8142fz8JkSi)). It is based on the [ESP32 Espresiff](https://www.espressif.com/en/products/socs/esp32) ([Wikipedia](https://en.wikipedia.org/wiki/ESP32])), a 32bit MCU Tensilica Xtensa LX6 with integrated WiFi, Bluetooth, and a lot of peripherals. This is the board I usually use for R&D.
+
+| <img src="https://ae01.alicdn.com/kf/H39c2130da52e43e7ac7ccee871075b46E.jpg" alt="LILYGO® TTGO T-Display ESP32 WiFi and Bluetooth Module Development Board For Arduino 1.14 Inch LCD" style="zoom:100%;" /> |
+| ------------------------------------------------------------ |
 
 ## USB WiFi dongle
 
-To do some telemetry and get some real time feedback when testing the system, a wireless communication with good throughput and low latency was required. As the KV260 lacks a dedicated wireless communication interface, a USB WiFi dongle was selected for this. For a more detailed information on how to install the drivers and setup the device used in this project please refer to [Adding USB-WiFi for the Kria KV260 (Ubuntu 20.04.3)](https://www.hackster.io/dramoz/adding-usb-wifi-for-the-kria-kv260-ubuntu-20-04-3-b5e8ea).
+To do some telemetry and get some real-time feedback when testing the system, wireless communication with good throughput and low latency was required. As the KV260 lacks a dedicated wireless communication interface, a USB WiFi dongle was selected for this. For more detailed information on how to install the drivers and set up the device used in this project please refer to [Adding USB-WiFi for the Kria KV260 (Ubuntu 20.04.3).](https://www.hackster.io/dramoz/adding-usb-wifi-for-the-kria-kv260-ubuntu-20-04-3-b5e8ea)
+
+| <img src="https://m.media-amazon.com/images/I/51E7UW6W20L._AC_SL1500_.jpg" alt="img" style="zoom:25%;" /> |
+| :----------------------------------------------------------: |
 
 ## Power considerations
 
+As the ATRover is a mobile platform, an appropriate power supply was required. SLA batteries are widely used in robotic applications. A [SLA12V/12Ah](https://www.power-sonic.com/wp-content/uploads/2018/12/Technical-Manual.pdf) battery was selected given the following rough estimates:
 
+- KV-260 power requirements: 36W (4Ah)
+- DC Motors: 2x21W (42W, 3.5Ah)
+
+Roughly at full power, the ATRover would require 80W or 6.7Ah. Note that the 12Ah capacity is rated for a 20Hr operation. A constant 3~4A discharge would reduce the capacity to ~9Ah, and give you between 2~3hr. The motors are running at half the capacity or lower speed.
 
 ## Other components
 
-To complete assemble an ATRover mini, some other components are required as:
+To complete assemble an ATRover mini, some other components are required:
 
+- 3D printed chassis
 - M3 screws
   - chasis
 - Power distribution block
-- Power cables
+- Power cables ([AWG16](https://www.powerstream.com/Wire_Size.htm))
   - KRIA power cable
   - DC motors
 - TTGO-T1 ZK-5AD connector
-- microUSB cable for Stereo Camera
+- micro-USB cable for Stereo Camera
 - USB-C cable for TTGO-T1
+
+Please refer to the BOM at the repository for more information.
 
 # Software/Firmware
 
-The journey through the KRIA KV-260 and Xilinx Development Tools was extensive and extenuating. Although I have learned a lot, at the end, with the timeline nearer everyday, I have to make a choice and start doing some real deployment. Fortunately, [PYNQ for the KV260](https://github.com/Xilinx/Kria-PYNQ) was made available [two months ago](https://community.element14.com/technologies/fpga-group/f/forum/50595/pynq-now-available-for-the-kria-kv260-vision-ai-starter-kit). In retrospective, I should have jumped right away into the PYNQ framework for this challenge, but after testing it and reading some comments in the forum, I decided to give put it on the side. At the end, I came back to it as:
+The journey through the KRIA KV-260 and Xilinx Development Tools was extensive and extenuating. Although I have learned a lot, in the end, with the timeline nearer every day, I have to make a choice and start doing some real deployment.
 
-- It is easier to deploy and test any AI
-- Works right away, no issues, fewer steps and if you miss any (you probably will not), it is easier to recover.
-- This should have been the start point when jumping into something as new as the KRIA KV-260.
-  - The KRIA flow is slightly different from other ZYNQ Ultrascale boards like the Ultra96-V2 or Z102
-  - There is plenty information about the KRIA, Xilinx Tools, Vitis, Vitis-AI, etc. But the information is hard to grasp, and it feels unorganized. The tutorials lack continuity, e.g. they required different tool versions, different boards, etc.
-  - There is no clear line to follow, actually there are several paths to follow - which get confusing and when you finished something, only at the end you realize that it was not the right tool version - and there is no additional information on how to migrate (or probably I did not find it).
+Given that there was no easy way to install the USB/WiFi drivers or any other driver (like the TTGO-T1 USB-Serial) in the [Petalinux ](https://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk.htm)flow, I decided to work with Ubuntu. [PYNQ for the KV260 ](https://github.com/Xilinx/Kria-PYNQ)was made available [two months ago.](https://community.element14.com/technologies/fpga-group/f/forum/50595/pynq-now-available-for-the-kria-kv260-vision-ai-starter-kit) Given that scripting is clearer with Python, I decided to switch to PYNQ. Initially, it worked right away without any issues. Running the examples and tutorials is more comfortable and easier to grasp.
 
 ## Required tools
 
 - [Kria-PYNQ](https://github.com/Xilinx/Kria-PYNQ)
-- [Vitis-AI v1.4](https://github.com/Xilinx/Vitis-AI/tree/1.4): the DPU-PYNQ uses version 1.4
+- [Vitis-AI v1.4.1](https://github.com/Xilinx/Vitis-AI/tree/1.4.1): the DPU-PYNQ uses version 1.4, but using v1.4.1
 -  [Visual Code](https://code.visualstudio.com/) + [PlatformIO](https://platformio.org/platformio-ide): the KV260 ATRover uses a TTGO-T1 board to control the DC motors via USB/Serial port. Please follow the instructions on each website to install the tools.
 
-## [PYNQ](https://github.com/Xilinx/Kria-PYNQ) to the rescue
+## [Kria PYNQ](https://github.com/Xilinx/Kria-PYNQ)
 
 > [Kria SOMs x Ubuntu x PYNQ](https://pages.xilinx.com/EN-WB-2022-03-22-KriaPYNQUbuntu_LP-Registration.html): nice introductory webinar
 
@@ -164,7 +186,7 @@ But there are some "*drawbacks*":
 - Performance: in theory, as you are running over Python you will suffer from latency and throughput. 
   - I have not test it, but I will do in the future. Nevertheless, for R&D and testing it is good enough.
 
-**PYNQ install**
+### PYNQ install
 
 > At the moment, PYNQ - KRIA installation is *"broken"* [Unable to install PYNQ #9](https://github.com/Xilinx/Kria-PYNQ/issues/9)
 > **It is possible to get PYNQ with Xilinx Dev. working by skipping the initial:**
@@ -261,11 +283,11 @@ ip a
 >     inet6 fe80::1fe:9c9e:1eaf:a932/64 scope link noprefixroute 
 >        valid_lft forever preferred_lft forever
 
-## Vitis-AI (v1.4)
+## Vitis-AI (v1.4.1)
 
 > Vitis-AI requires around 100GB of hard drive space
 
-As the current Vitis-AI version is 2.0, but DPU-PYNQ requires v1.4, please follow the next steps to install the proper tool version. Vitis-AI is installed and run in your local machine (Ubuntu)
+As the current Vitis-AI version is 2.0, but DPU-PYNQ requires v1.4.1, please follow the next steps to install the proper tool version. Vitis-AI is installed and run in your local machine (Ubuntu)
 
 **Installation steps**
 
@@ -320,13 +342,13 @@ As the current Vitis-AI version is 2.0, but DPU-PYNQ requires v1.4, please follo
 
 ## Additional Drivers & Ubuntu configuration
 
-**Ubuntu packages**
+### Ubuntu packages
 
 ```bash
 sudo apt install -y dkms net-tools build-essential
 ```
 
-**USB WiFi**
+### USB WiFi
 
 ```bash
 mkdir repos; cd repos
@@ -348,25 +370,25 @@ sudo make install
 sudo reboot
 ```
 
-**WiFi configuration**
+### WiFi configuration
 
 The easiest way to configure the WiFi is through GNOME. After login, click on the down icon near the power button ⏻▼ and select your network. This connection will be preserved after shutdown without the need of login.
 
 Alternatively you can set it on the command line. Currently I do not know how to make a connection permanently (aka WiFi connection without login), so the GUI method is recommended.
 
-**Final steps**
+### Final steps
 
 ```bash
 sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y; sudo reboot
 ```
 
-***Optional packages***
+### ***Optional packages***
 
 ```bash
 sudo apt install -y graphviz gtkwave tree meld
 ```
 
-***Optional Python Virtualenv Wrapper***
+### ***Optional Python Virtualenv Wrapper***
 
 > ⚠ PYNQ has its own `virtualenv` setup, I did not test creating a new one and I do not know if there would be any side effect on doing so
 
@@ -616,7 +638,7 @@ Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be use
 - The KRIA KV260 examples run on Petalinux and use a [DPU B3136](https://xilinx.github.io/kria-apps-docs/2020.2/build/html/docs/smartcamera/docs/hw_arch_accel.html), with Xilinx tools 2021.1
 - The PYNQ has an overlay [DPU-PYNQ](https://github.com/Xilinx/DPU-PYNQ) with a [DPU B4096](https://github.com/Xilinx/DPU-PYNQ/blob/master/boards/KV260/dpu_conf.vh), and uses Vitis-AI 1.4.0
 
-When selecting the model for this project, one useful metric available at the AI Model Zoo worth mentioning is the [Performance on Kria KV260 SOM](https://github.com/Xilinx/Vitis-AI/tree/v1.4/models/AI-Model-Zoo#performance-on-kria-kv260-som). It summarizes the KV260 latency and throughput of the available model.
+When selecting the model for this project, one useful metric available at the AI Model Zoo worth mentioning is the [Performance on Kria KV260 SOM](https://github.com/Xilinx/Vitis-AI/tree/v1.4.1/models/AI-Model-Zoo#performance-on-kria-kv260-som). It summarizes the KV260 latency and throughput of the available model.
 
 CNNs are available in different topologies, which basically define the application target. Furthermore, each model can be trained using different data sets ([ImageNet](https://www.image-net.org/), [COCO](https://cocodataset.org/), [CityScapes](https://www.cityscapes-dataset.com/), [SYNTHIA](http://synthia-dataset.net/) among others)
 
@@ -743,6 +765,32 @@ Vitis-AI is the tool required to tailor the neural network model to project part
 
 - A suitable dataset: although there are some indoor datasets, most are at higher levels.
 - Gathering a dataset is time consuming, and resources hungry.
+
+# Moving out of PYNQ
+
+Unfortunately, as explained before - it was not possible to run the YOLOv4 in PYNQ. A temporal solution was provides by Xilinx support.
+
+**Petalinux with DPUCZDX8G B4096**
+
+[Xilinx Vitis-AI](https://github.com/Xilinx/Vitis-AI/tree/master/setup/mpsoc/VART) provides an out-of-the shelf board image with Vitis AI runtime packages and examples. The board is setup in a similar way as explained before.
+
+- Download the [KV260 board image](https://www.xilinx.com/member/forms/download/design-license-xef.html?filename=xilinx-kv260-dpu-v2021.2-v2.0.0.img.gz)
+
+```bash
+# 
+
+```
+
+
+
+**Ubuntu with Vitis-AI runtime**
+
+```bash
+# Ubuntu clean
+sudo apt install vitis-ai-runtime
+```
+
+
 
 # Final Remarks
 
