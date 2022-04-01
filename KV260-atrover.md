@@ -388,7 +388,7 @@ sudo apt update -y; sudo apt upgrade -y; sudo apt autoremove -y; sudo reboot
 sudo apt install -y graphviz gtkwave tree meld
 ```
 
-### ***Optional Python Virtualenv Wrapper***
+### Optional Python Virtualenv Wrapper
 
 > ⚠ PYNQ has its own `virtualenv` setup, I did not test creating a new one and I do not know if there would be any side effect on doing so
 
@@ -405,7 +405,7 @@ With your favorite editor append the following lines to `.bashrc`
 > export VIRTUALENVWRAPPER_VIRTUALENV=\$HOME/.local/bin/virtualenv
 > source \$HOME/.local/bin/virtualenvwrapper.sh
 
-💡In the [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover) I have provide a set of `.bash` configuration scripts that include some extra setup for Ubuntu command line terminals including the above `virtualenv and virtualwrapper` setup. 
+💡In the [KV260-ATRover GitHub repository](https://github.com/dramoz/kv260-atrover) I have provided a set of `.bash` configuration scripts that include some extra setup for Ubuntu command line terminals including the above `virtualenv and virtualwrapper` setup. 
 
 They will transform the command line prompt from
 
@@ -446,15 +446,15 @@ cp -fv ~/dev/kv260-atrover/scripts/.bash* ~/
 source ~/.bashrc
 ```
 
-Finally install the required python dependencies:
+Finally, install the required python dependencies:
 
 ```bash
 pip install -r ~/dev/kv260-atrover/scripts/requirements.txt
 ```
 
-**TTGO-T1 firmware**
+### TTGO-T1 firmware
 
-The TTGO-T1 code is a simple four channel PWM generator connected to the ZK-5AD motor driver. It communicates to the KV260 board with a USB/Serial port. The KV260 application send the following commands as requried:
+The TTGO-T1 code is a simple four-channel PWM generator connected to the ZK-5AD motor driver. It communicates to the KV260 board with a USB/Serial port. The KV260 application send the following commands as requried:
 
 - `*m###, m in [f, b, r, l, s]`
 
@@ -481,9 +481,9 @@ The default parameters were set on a trial an error basis as:
 - [PWM frequency](https://electronics.stackexchange.com/questions/242293/is-there-an-ideal-pwm-frequency-for-dc-brush-motors/): 8Hz
 - `speed_step`: 8, `accel_step_ms`: 200
 
-The firmware of the TTGO-T1 board was developed using Visual Code PlatformIO. After installing Visual Code + PlatformIO, clone the project repository on a local machine and add the [ttgo-atrover-motor-control](https://github.com/dramoz/kv260-atrover/tree/main/ttgo-atrover-motor_control) project to PlatformIO. Connect the board to an available USB serial port, compile (✓) and flash (➔) the board by clicking on the icons located at the bottom tool bar in VS code.
+The firmware of the TTGO-T1 board was developed using Visual Code PlatformIO. After installing Visual Code + PlatformIO, clone the project repository on a local machine and add the [ttgo-atrover-motor-control](https://github.com/dramoz/kv260-atrover/tree/main/ttgo-atrover-motor_control) project to PlatformIO. Connect the board to an available USB serial port, compile (✓) and flash (➔) the board by clicking on the icons located at the bottom toolbar in VS code.
 
-It is possible to program the TTGO-T1 board directly from the KRIA KV-260 with [PlatformIO Remote Development](https://docs.platformio.org/en/stable/plus/pio-remote.html) tools.
+💡It is possible to program the TTGO-T1 board directly from the KRIA KV-260 with [PlatformIO Remote Development](https://docs.platformio.org/en/stable/plus/pio-remote.html) tools.
 
 > A free PlatformIO account is required for remote development.
 
@@ -529,7 +529,7 @@ On the KV260
   pio remote agent start
   ```
 
-- > The first call to `pio remote agent start` will require some time while the required packages and dependencies are installed
+  > The first call to `pio remote agent start` will require some time while the required packages and dependencies are installed
 
 Local machine remote programming
 
@@ -559,7 +559,7 @@ PlatformIO Remote Development is a useful remote programing tool, as if required
 
 All the scripts are done in Python using Visual Studio code. Although JupyterLab was nice for the initial R&D, it is faster to run some OpenCV like `imshow()` outside the Jupyter environment, with `ssh -X`.
 
-**TTGO-T1 and DC motors**
+## TTGO-T1 and DC motors
 
 ```bash
 ssh ubuntu@kria_ip
@@ -580,9 +580,7 @@ Press the TTGO-T1 reset button, a message similar to this would appear
 > entry 0x400806b4
 > **?TTGO**
 
-Run some commands
-
-- `*f064`, `*b128`, `*s0000`, `*l128`, `!0000` ...
+Run some commands: `*f064`, `*b128`, `*s0000`, `*l128`, `!0000` ...
 
 When done, disconnect screen to free serial port
 
@@ -593,7 +591,7 @@ When done, disconnect screen to free serial port
 > [screen is terminating]
 > ubuntu@kria:~/$
 
-**Stereo camera test**
+## Stereo camera test
 
 To run a simple test on the stereo camera:
 
@@ -625,7 +623,7 @@ python stereoVision.py
 
 >  ☝ At the moment, the triangulation demo is exiting with a `Segmentation fault (core dumped)` error which I did not have time to investigate further at the moment of writing this project.
 
-**Movement Test**
+## **Movement Test**
 
 A simple script to validate the communication between the KV260 board and the TTGO while testing the motors was done.
 
@@ -633,14 +631,14 @@ VIDEO: https://youtu.be/WgYcuWozWEg
 
 # Selecting the model(s)
 
-Xilinx provides with the Vitis-AI a set of pre-trained NN models that can be used as a starting point. It is referenced as [Vitis-AI AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo). The models are deployed on the FPGA on the DPU IP. As the DPU comes in different flavors, please note that if the model is not available for the current DPU model, extra steps are required with Vitis-AI framework to deploy the solution properly.
+Xilinx provides with the Vitis-AI framework a set of pre-trained NN models that can be used as a starting point. It is referenced as [Vitis-AI AI-Model-Zoo](https://github.com/Xilinx/Vitis-AI/tree/master/models/AI-Model-Zoo). The models are deployed on the FPGA on the DPU IP. As the DPU comes in different flavors, please note that if the model is not available for the current DPU model, extra steps are required with Vitis-AI framework to deploy the solution properly.
 
 - The KRIA KV260 examples run on Petalinux and use a [DPU B3136](https://xilinx.github.io/kria-apps-docs/2020.2/build/html/docs/smartcamera/docs/hw_arch_accel.html), with Xilinx tools 2021.1
 - The PYNQ has an overlay [DPU-PYNQ](https://github.com/Xilinx/DPU-PYNQ) with a [DPU B4096](https://github.com/Xilinx/DPU-PYNQ/blob/master/boards/KV260/dpu_conf.vh), and uses Vitis-AI 1.4.0
 
-When selecting the model for this project, one useful metric available at the AI Model Zoo worth mentioning is the [Performance on Kria KV260 SOM](https://github.com/Xilinx/Vitis-AI/tree/v1.4.1/models/AI-Model-Zoo#performance-on-kria-kv260-som). It summarizes the KV260 latency and throughput of the available model.
+When selecting the model for this project, one useful metric available at the AI Model Zoo worth mentioning is the [Performance of Kria KV260 SOM](https://github.com/Xilinx/Vitis-AI/tree/v1.4.1/models/AI-Model-Zoo#performance-on-kria-kv260-som). It summarizes the KV260 latency and throughput of the available model.
 
-CNNs are available in different topologies, which basically define the application target. Furthermore, each model can be trained using different data sets ([ImageNet](https://www.image-net.org/), [COCO](https://cocodataset.org/), [CityScapes](https://www.cityscapes-dataset.com/), [SYNTHIA](http://synthia-dataset.net/) among others)
+CNN's are available in different topologies, which basically define the application target. Furthermore, each model can be trained using different data sets ([ImageNet](https://www.image-net.org/), [COCO](https://cocodataset.org/), [CityScapes](https://www.cityscapes-dataset.com/), [SYNTHIA](http://synthia-dataset.net/) among others)
 
 From the different topologies available in the AI Model Zoo, the following were selected to do some R&D:
 
@@ -648,9 +646,9 @@ From the different topologies available in the AI Model Zoo, the following were 
 - [SSD](https://towardsdatascience.com/understanding-ssd-multibox-real-time-object-detection-in-deep-learning-495ef744fab): (Single Shot MultiBox Detector) object detection.
 - [FADnet](https://arxiv.org/abs/2003.10758) ([GitHub repository](https://github.com/HKBU-HPML/FADNet)): disparity estimation
 
-[**Downloading a model**](https://github.com/Xilinx/Vitis-AI/tree/1.4/models/AI-Model-Zoo#automated-download-script)
+## [**Downloading a model**](https://github.com/Xilinx/Vitis-AI/tree/1.4/models/AI-Model-Zoo#automated-download-script)
 
-> Models are downloaded to the local machine where Vitis-AI was installed and later transfer with `spc` to the ATRover.
+> Models are downloaded to the local machine where Vitis-AI was installed and later transfer with [`spc`](https://acloudguru.com/blog/engineering/ssh-and-scp-howto-tips-tricks) to the ATRover.
 
 > To validate the Kria-PYNQ framework running on the KV-260, the resnet50 model was also downloaded. 
 
@@ -726,9 +724,9 @@ for f in ../*.gz; do tar -xvzf "$f"; done
 
 The `*.xmodel` files would be the models to load into the DPU.
 
-**Running the scripts**
+## Running the scripts
 
-> Each models requires a pre-process to the input frames and a post-process of the output different in each case. The information can be gather from the Board/GPU models that can be downloaded using the same previous steps (`python downloads.py`) and selecting the board/GPU option
+> Each models requires a pre-process to the input frames and a post-process of the output different in each case. The information can be gather from the Vitis-AI examples, and the Board/GPU models that can be downloaded using the same previous steps (`python downloads.py`) and selecting the board/GPU option
 >
 > `1:  ['type', 'float & quantized']['board', 'GPU']`
 >
@@ -745,19 +743,7 @@ The `*.xmodel` files would be the models to load into the DPU.
 >
 > The postprocess depends on each CNN output vector format.
 
-## Deploying TF SSD
-
-```bsh
-pip install --upgrade tensorflow
-```
-
-## Deploying YOLOv4
-
-[Yolo 2 Explained](https://towardsdatascience.com/yolo2-walkthrough-with-examples-e40452ca265f#:~:text=Yolo%20Output%20Format&text=Yolo2%20uses%20a%20VGG%2Dstyle,to%20increase%20speed%20or%20accuracy.&text=As%20you%20can%20see%2C%20yolo's,what%20we've%20seen%20before.) ([GitHub](https://github.com/zzxvictor/YOLO_Explained))
-
-[Old Vitis-AI YOLO example](https://github.com/Xilinx/Vitis-AI/blob/v1.1/mpsoc/vitis_ai_dnndk_samples/tf_yolov3_voc_py/tf_yolov3_voc.py)
-
-
+ Test scripts to run each model are located in the repository under the scripts directory.
 
 ## Improving the model(s)
 
@@ -766,60 +752,45 @@ Vitis-AI is the tool required to tailor the neural network model to project part
 - A suitable dataset: although there are some indoor datasets, most are at higher levels.
 - Gathering a dataset is time consuming, and resources hungry.
 
-# Moving out of PYNQ
+# Main Application
 
-Unfortunately, as explained before - it was not possible to run the YOLOv4 in PYNQ. A temporal solution was provides by Xilinx support.
+***Moving out of PYNQ***
 
-**Petalinux with DPUCZDX8G B4096**
+Unfortunately, during the final steps of writing this report, it was not possible to run the YOLOv4 in PYNQ and perform some final tests. A temporal solution was provided by Xilinx support. However, it was not compatible with my Python scripts or disabled the possibility of WiFi and UART/Serial interfaces. And, I ran out of time. Therefore (and sadly), it was not possible to present more videos or capture better examples of the working project.
 
-[Xilinx Vitis-AI](https://github.com/Xilinx/Vitis-AI/tree/master/setup/mpsoc/VART) provides an out-of-the shelf board image with Vitis AI runtime packages and examples. The board is setup in a similar way as explained before.
-
-- Download the [KV260 board image](https://www.xilinx.com/member/forms/download/design-license-xef.html?filename=xilinx-kv260-dpu-v2021.2-v2.0.0.img.gz)
-
-```bash
-# 
-
-```
-
-
-
-**Ubuntu with Vitis-AI runtime**
-
-```bash
-# Ubuntu clean
-sudo apt install vitis-ai-runtime
-```
-
-
+The main application gathers the identified objects from YOLOv4 or SSD on both video channels, and by using the triangulation OpenCV algorithm it provides a rough estimate of the distance from the ATRover to the object. If a dog is identified by the ATRover, it will try to preserve the distance and follow or move back from it.
 
 # Final Remarks
 
-This experience was a short/long journey with the KRIA KV-260. Initially I was contemplating getting a Ultra96-V2 as it seemed better on paper for this type of project, but the free hardware option was the KV-260.
+This experience was a short/long journey with the KRIA KV-260. Initially, I was contemplating getting an Ultra96-V2 as it seemed better on paper for this type of project, but the free hardware option was the KV-260.
 
-In retrospective, my gut feeling was 50/50. On one side, I think the Ultra96-V2 is "better" suited for the ATRover with it smaller form factor, ready WiFi and more I/O ports available out of the box. On the other side, the Kria KV-260 has more USB-Ports, extra camera ports, doubles the DDR-RAM and is capable of video streaming with its integrated VCU (Video Codec Unit) - features which make it ideal for R&D, which at the end is the main idea behind the KV-260 Starter kit.
+In retrospect, my gut feeling was 50/50. On one side, I think the Ultra96-V2 is "better" suited for the ATRover with its smaller form factor, ready WiFi, and more I/O ports available out of the box. On the other side, the Kria KV-260 has more USB Ports, extra camera ports, doubles the DDR-RAM and is capable of video streaming with its integrated VCU (Video Codec Unit) - features that make it ideal for R&D, which is the main idea behind the KV-260 Starter kit.
 
-As a plus, there is no need to configure any jumpers to select the boot target and the capability of dynamic loading overlays it is key. Finally, in my case, getting Ubuntu out-of-the shelf ready and working without any issues is awesome.
+As a plus, there is no need to configure any jumpers to select the boot target, and the capability of dynamic loading overlays is key. Finally, in my case, getting Ubuntu out-of-the-shelf-ready and working without any issues is awesome.
 
-Unfortunately I run out of time for the [Adaptive Computing Challenge 2021](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things where finally getting interesting, and I was only able to deploy a simple application. Learning all this and going through the available documentation, examples was extenuating. Maybe next time I should spend less time at my 3D printer.
+A set of unfortunate events in the last couple of weeks played against the remaining time for the [Adaptive Computing Challenge 2021,](https://www.hackster.io/contests/xilinxadaptivecomputing2021) when things were finally getting interesting.
 
 But it was worth the journey, I came from almost zero AI/ML knowledge and Vitis/Zynq+ to be able to deploy some CNN on a small vehicle platform and make it move around while identifying some objects.
 
-The final activities to have a proper closure of the first ATRover phase that are not done yet give the timing left before submitting the project are:
+The final activities to have a proper closure of the first ATRover phase that is not done yet given the timing left before submitting the project are:
 
 - BOM: improve the bill of materials with a guide on how to assemble the whole project
-- Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine tune to my printer (Ender3 modified to print 2.85mm)
+- Chassis 3D print: the 3D models are available as OpenSCAD files, but they were fine-tuned to my printer (Ender3 modified to print 2.85mm)
 - TTGO-T1 UART drivers installation on the KRIA KV-260 Ubuntu desktop OS: only a short explanation was given in this document.
 - DC motor characterization + improve DC motor control: the current scripts do not have any proper motor control (e.g. PID) and there is no proper motor parameters characterization. Also, the current motor setup is generating too much vibration while running at medium speed.
+- Provide in the future more videos of the implemented application.
+
+There will be completed later on a more calm sea, and are not part of this deliverable. Finally, the repo is tagged to preserve the status of the project to comply with the challenge deadline.
 
 # Future work
 
 - **Proper Overlay Pipeline**
 
-  As mentioned earlier, the available overlays for the Kria-PYNQ does not allow to perform video pre-processing while using a DPU. The next step would be to develop a PYNQ overlay more suitable for the KV260-ATRover setup. The overlay should also include a proper video stream generation using the video codec capabilities of the KRIA SOM.
+  As mentioned earlier, the available architecture for the Kria-PYNQ does not allow to perform video pre-processing while using a DPU. The next step would be to develop a PYNQ overlay more suitable for the KV260-ATRover setup. The overlay should also include a proper video stream generation using the video codec capabilities of the KRIA SOM.
 
 - **Training Dataset**
 
-  For what I found, most current datasets pictures are up to high, and the world is shown from a complete different perspective than an almost at floor level the ATRover sees (which make you thing how little kids see the world). Now that the ATRover has some limited mobility, it will be possible to gather new training images to improve the CNN training.
+  From what I found, most current datasets pictures are up to high, and the world is shown from a completely different perspective as compared to an almost floor level ATRover view. Now that the ATRover has some limited mobility, it will be possible to gather new training images to improve the CNN training.
 
 - **DC motors downgrade**
 
@@ -848,18 +819,11 @@ The final activities to have a proper closure of the first ATRover phase that ar
   - Single CNN dual camera SSD/YOLO with distance estimation as output
   - Self-learning/self-calibration CNN for stereovision camera
 
-- **[ROS2](https://docs.ros.org/en/foxy/index.html)**
-
-  Although ROS2 is available, it is still on the alpha release side
-
+- **Explore [ROS2](https://docs.ros.org/en/foxy/index.html)**
 - **Web Interface**
-
-  - Although JupyterLab is nice for some work, a minimalistic webInterface would be nice to have
-
+  - Although JupyterLab is nice for some work, a minimalistic web interface would be a nice feature to have
 - **From PYNQ to C++**
-
-  - test performance difference between running on Python and C++
-  - almost everything in the Vitis-AI is done in C++, but everything looks prettier on Python
+  - After the final drawbacks, I have decided to move to C++ from Python. Although everything looks prettier on Python, an increase in performance should be expected, plus almost everything in the Vitis-AI is done in C++.
 
 # Future Projects
 
@@ -872,9 +836,9 @@ Finally, I will try to write some starting tutorials on deploying AI/ML on the X
 
 # Acknowledgments
 
-I want to tank the HacksterIO community for sharing, answering and asking questions. HacksterIO and Xilinx staff for the effort and time into promoting these challenges and activities - and answering questions. I found them a great way to improve my know-how.
+I want to tank the HacksterIO community for sharing, answering, and asking questions. HacksterIO and Xilinx staff for the effort and time into promoting these challenges and activities - and answering questions. I found them a great way to improve my know-how.
 
-Last but not the least, my wife and my kids for supporting and not letting me quit, for understanding my occasional absences (or more often coming late to dinner) and helping with the chores (the ones I was supposed to do)
+Last but not the least, my wife and my kids for supporting and not letting me quit, for understanding my occasional absences (or more often coming late to dinner), and for helping with the chores (the ones I was supposed to do)
 
 As always, comments are most welcome.
 
@@ -901,11 +865,15 @@ As always, comments are most welcome.
 
 | Title            | Remarks                                                      | URL                                                          |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Kria-PYNQ        | -                                                            | https://github.com/Xilinx/Kria-PYNQ                          |
+| DPU on PYNQ      | -                                                            | https://github.com/Xilinx/DPU-PYNQ                           |
 | VART             | [C++ APIs](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/C-APIs)<br />[Python APIs](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/Python-APIs) | https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/VART-Programming-APIs |
 | XIR              | [Xilinx Intermediate Representation](https://docs.xilinx.com/r/en-US/ug1414-vitis-ai/Compiling-with-an-XIR-based-Toolchain)<br />graph-based intermediate representation of AI algorithms | https://github.com/Xilinx/Vitis-AI/tree/master/tools/Vitis-AI-Runtime/VART/xir |
 | DNNDK            | Deep Neural Network Development Kit User Guide               | https://docs.xilinx.com/v/u/1.6-English/ug1327-dnndk-user-guide |
 | Vitis-AI         | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1414-vitis-ai/Revision-History |
 | Vitis-AI Library | User Guide                                                   | https://docs.xilinx.com/r/1.4-English/ug1354-xilinx-ai-sdk/Revision-History |
+| Vitis-AI GitHub  | [AI-Model Zoo](https://github.com/Xilinx/Vitis-AI/tree/1.4.1/models/AI-Model-Zoo) | https://github.com/Xilinx/Vitis-AI/tree/1.4.1/               |
+| DPU YOLOv3       | Old DPU-PYNQ Vitis AI 1.2 YOLOv3 notebook                    | https://github.com/Xilinx/DPU-PYNQ/blob/v1.2.0/pynq_dpu/edge/notebooks/dpu_yolo_v3.ipynb |
 
 > ⚠ A lot of time was wasted while looking at the wrong Vitis AI User Guide (UG1414) version [v1.4](https://docs.xilinx.com/r/1.4-English/ug1414-vitis-ai/) which was incorrect, the [v1.4.1](https://docs.xilinx.com/r/1.4.1-English/ug1414-vitis-ai/) does contains the required VART API information required to deploy with Vitis AI-1.4
 
@@ -916,4 +884,5 @@ As always, comments are most welcome.
 | CNN Tensor Shape (aka .dims) | Tensors are in the form NHWC (batchsize, height,width,channels) | https://deeplizard.com/learn/video/k6ZF1TSniYk               |
 | YOLO output                  | YOLO output data post-processing                             | https://towardsdatascience.com/yolo2-walkthrough-with-examples-e40452ca265f |
 | YOLO + OpenCV                | YOLO object detection with OpenCV                            | https://pyimagesearch.com/2018/11/12/yolo-object-detection-with-opencv/ |
+| SSD + Keras                  | Implementing Single Shot Detector (SSD) in Keras             | https://towardsdatascience.com/tagged/object-detection-in-keras |
 
