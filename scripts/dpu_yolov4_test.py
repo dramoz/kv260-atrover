@@ -99,7 +99,7 @@ def run_dpu(dpu, frame):
     
     input_ndim_1 = tuple(input_tensor_buffers[0].get_tensor().dims)
     fixpos = input_tensor_buffers[0].get_tensor().get_attr("fix_point")
-    
+    print(f"fixpos: {fixpos}")
     ih, iw, _ = frame.shape
     img = preprocess_img(frame, (416, 416), fixpos)
     input_data = np.asarray(input_tensor_buffers[0])
@@ -118,7 +118,7 @@ def run_dpu(dpu, frame):
     #boxes.append( yolo_box(conv_out[0], 52, num_classes,yolo_anchors[yolo_anchor_masks[2]],0) )
     #boxes.append( yolo_box(conv_out[1], 26, num_classes,yolo_anchors[yolo_anchor_masks[1]],1) )
     boxes.append( yolo_box(conv_out[2], 13, num_classes,yolo_anchors[yolo_anchor_masks[0]],2) )
-    outputs = yolo_non_max_suppression(boxes, 0.25, 0.45)
+    outputs = yolo_non_max_suppression(boxes, 0.30, 0.45)
     boxes, confidence, classes, nums = outputs
     print(nums)
     
@@ -134,7 +134,7 @@ def run_dpu(dpu, frame):
     img = draw_outputs_scale(frame, scale, offset, outputs, coco_labels)
     #img = draw_outputs_scale(frame, outputs, class_names)
     """
-    return frame
+    return img
 
 # =============================================================================
 # -------------------------------------------------------------------
@@ -195,7 +195,8 @@ if cam.isOpened():
         
         # ---------------------------------------------------------------------------
         # Draw final
-        cv2.imshow("org", img_out)
+        cv2.imshow("org", frame)
+        cv2.imshow("out", resize_with_padding(frame, (416, 416)))
         
         # ---------------------------------------------------------------------------
         # Check exit
