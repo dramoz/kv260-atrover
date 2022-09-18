@@ -30,7 +30,8 @@ yolo_anchor_masks = np.array([[6, 7, 8], [3, 4, 5], [0, 1, 2]])
 
 # -------------------------------------------------------------------
 # Load .xmodel downloaded from Vitis-AI repository
-yolov4_model_path = "models/yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel"
+#yolov4_model_path = "models/yolov4_leaky_spp_m/yolov4_leaky_spp_m.xmodel"
+yolov4_model_path = "yolov4_leaky_spp_m.xmodel"
 
 # =============================================================================
 # -------------------------------------------------------------------
